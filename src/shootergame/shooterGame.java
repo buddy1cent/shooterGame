@@ -167,7 +167,87 @@ public class shooterGame {
             }
         }
         
+                
+        ceilingDisplayList = glGenLists(1);
+        glNewList(ceilingDisplayList, GL_COMPILE);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0);
+        glVertex3f(-gridSize, ceilingHeight, -gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, 0);
+        glVertex3f(gridSize, ceilingHeight, -gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glVertex3f(gridSize, ceilingHeight, gridSize);
+        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glVertex3f(-gridSize, ceilingHeight, gridSize);
+        glEnd();
+        glEndList();
+        
+        wallDisplayList = glGenLists(1);
+        glNewList(wallDisplayList, GL_COMPILE);
 
+        glBegin(GL_QUADS);
+
+        // North wall
+
+        glTexCoord2f(0, 0);
+        glVertex3f(-gridSize, floorHeight, -gridSize);
+        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glVertex3f(gridSize, floorHeight, -gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glVertex3f(gridSize, ceilingHeight, -gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, 0);
+        glVertex3f(-gridSize, ceilingHeight, -gridSize);
+
+        // West wall
+
+        glTexCoord2f(0, 0);
+        glVertex3f(-gridSize, floorHeight, -gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, 0);
+        glVertex3f(-gridSize, ceilingHeight, -gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glVertex3f(-gridSize, ceilingHeight, +gridSize);
+        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glVertex3f(-gridSize, floorHeight, +gridSize);
+
+        // East wall
+
+        glTexCoord2f(0, 0);
+        glVertex3f(+gridSize, floorHeight, -gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, 0);
+        glVertex3f(+gridSize, floorHeight, +gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glVertex3f(+gridSize, ceilingHeight, +gridSize);
+        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glVertex3f(+gridSize, ceilingHeight, -gridSize);
+
+        // South wall
+
+        glTexCoord2f(0, 0);
+        glVertex3f(-gridSize, floorHeight, +gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, 0);
+        glVertex3f(-gridSize, ceilingHeight, +gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glVertex3f(+gridSize, ceilingHeight, +gridSize);
+        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glVertex3f(+gridSize, floorHeight, +gridSize);
+
+        glEnd();
+
+        glEndList();
+
+        floorDisplayList = glGenLists(1);
+        glNewList(floorDisplayList, GL_COMPILE);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0);
+        glVertex3f(-gridSize, floorHeight, -gridSize);
+        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glVertex3f(-gridSize, floorHeight, gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glVertex3f(gridSize, floorHeight, gridSize);
+        glTexCoord2f(gridSize * 10 * tileSize, 0);
+        glVertex3f(gridSize, floorHeight, -gridSize);
+        glEnd();
+        glEndList();
         
         
     }
