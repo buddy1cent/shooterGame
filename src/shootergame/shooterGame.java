@@ -10,7 +10,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.vector.Vector3f;
-import org.newdawn.slick.Color;
+//import org.newdawn.slick.Color;
 
 
 import java.io.FileInputStream;
@@ -25,8 +25,8 @@ import org.lwjgl.opengl.ARBTextureRg;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
+//import org.newdawn.slick.opengl.Texture;
+//import org.newdawn.slick.opengl.TextureLoader;
 
 /**
  * A LWJGL port of the awesome MineFront Pre-ALPHA 0.02 Controls: W/UP = forward; A/LEFT = strafe left; D/RIGHT = strafe
@@ -136,7 +136,7 @@ public class shooterGame {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, 
                     GL_UNSIGNED_BYTE, buffer);
             
-            in = new FileInputStream("src/res/wall.png");
+            in = new FileInputStream("src/res/stone_wall.png");
             decoder = new PNGDecoder(in);
             buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
             decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
@@ -191,9 +191,9 @@ public class shooterGame {
 
         glTexCoord2f(0, 0);
         glVertex3f(-gridSize, floorHeight, -gridSize);
-        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glTexCoord2f(0, gridSize * 40 * tileSize);
         glVertex3f(gridSize, floorHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 40 * tileSize);
         glVertex3f(gridSize, ceilingHeight, -gridSize);
         glTexCoord2f(gridSize * 10 * tileSize, 0);
         glVertex3f(-gridSize, ceilingHeight, -gridSize);
@@ -204,18 +204,18 @@ public class shooterGame {
         glVertex3f(-gridSize, floorHeight, -gridSize);
         glTexCoord2f(gridSize * 10 * tileSize, 0);
         glVertex3f(-gridSize, ceilingHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 40 * tileSize);
         glVertex3f(-gridSize, ceilingHeight, +gridSize);
-        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glTexCoord2f(0, gridSize * 40 * tileSize);
         glVertex3f(-gridSize, floorHeight, +gridSize);
 
         // East wall
 
         glTexCoord2f(0, 0);
         glVertex3f(+gridSize, floorHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, 0);
+        glTexCoord2f(gridSize * 40 * tileSize, 0);
         glVertex3f(+gridSize, floorHeight, +gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glTexCoord2f(gridSize * 40 * tileSize, gridSize * 10 * tileSize);
         glVertex3f(+gridSize, ceilingHeight, +gridSize);
         glTexCoord2f(0, gridSize * 10 * tileSize);
         glVertex3f(+gridSize, ceilingHeight, -gridSize);
@@ -226,9 +226,9 @@ public class shooterGame {
         glVertex3f(-gridSize, floorHeight, +gridSize);
         glTexCoord2f(gridSize * 10 * tileSize, 0);
         glVertex3f(-gridSize, ceilingHeight, +gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
+        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 40 * tileSize);
         glVertex3f(+gridSize, ceilingHeight, +gridSize);
-        glTexCoord2f(0, gridSize * 10 * tileSize);
+        glTexCoord2f(0, gridSize * 40 * tileSize);
         glVertex3f(+gridSize, floorHeight, +gridSize);
 
         glEnd();
@@ -260,7 +260,142 @@ public class shooterGame {
     }
     
     private static void input(){
-        //Dopsat
+        
+        while (Mouse.next()) {
+            if (Mouse.isButtonDown(0)) {
+                Mouse.setGrabbed(true);
+            }
+            if (Mouse.isButtonDown(1)) {
+                Mouse.setGrabbed(false);
+            }
+        }
+        if (Mouse.isGrabbed()) {
+            float mouseDX = Mouse.getDX() * mouseSpeed * 0.16f;
+            float mouseDY = Mouse.getDY() * mouseSpeed * 0.16f;
+            if (rotation.y + mouseDX >= 360) {
+                rotation.y = rotation.y + mouseDX - 360;
+            } else if (rotation.y + mouseDX < 0) {
+                rotation.y = 360 - rotation.y + mouseDX;
+            } else {
+                rotation.y += mouseDX;
+            }
+           
+            if (rotation.x - mouseDY >= maxLookDown && rotation.x - mouseDY <= maxLookUp) {
+                rotation.x += -mouseDY;
+            } else if (rotation.x - mouseDY < maxLookDown) {
+                rotation.x = maxLookDown;
+            } else if (rotation.x - mouseDY > maxLookUp) {
+                rotation.x = maxLookUp;
+            }
+        }
+       
+        boolean keyUp = Keyboard.isKeyDown(Keyboard.KEY_UP) || Keyboard.isKeyDown(Keyboard.KEY_W);
+        boolean keyDown = Keyboard.isKeyDown(Keyboard.KEY_DOWN) || Keyboard.isKeyDown(Keyboard.KEY_S);
+        boolean keyLeft = Keyboard.isKeyDown(Keyboard.KEY_LEFT) || Keyboard.isKeyDown(Keyboard.KEY_A);
+        boolean keyRight = Keyboard.isKeyDown(Keyboard.KEY_RIGHT) || Keyboard.isKeyDown(Keyboard.KEY_D);
+        boolean flyUp = Keyboard.isKeyDown(Keyboard.KEY_SPACE);
+        boolean flyDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+        boolean esc = Keyboard.isKeyDown(Keyboard.KEY_ESCAPE);
+        
+        if (esc) {
+                exit=true;
+        }
+       
+        if (keyUp && keyRight && !keyLeft && !keyDown) {
+                float angle = rotation.y + 45;
+                Vector3f newPosition = new Vector3f(position);
+                float hypotenuse = (walkingSpeed * 0.0002f) * delta;
+                float adjacent = hypotenuse * (float) Math.cos(Math.toRadians(angle));
+                float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
+                newPosition.z += adjacent;
+                newPosition.x -= opposite;
+                position.z = newPosition.z;
+                position.x = newPosition.x;
+        }
+        
+        if (keyUp && keyLeft && !keyRight && !keyDown) {
+            float angle = rotation.y - 45;
+            Vector3f newPosition = new Vector3f(position);
+            float hypotenuse = (walkingSpeed * 0.0002f) * delta;
+            float adjacent = hypotenuse * (float) Math.cos(Math.toRadians(angle));
+            float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
+            newPosition.z += adjacent;
+            newPosition.x -= opposite;
+            position.z = newPosition.z;
+            position.x = newPosition.x;
+        }
+        
+        if (keyUp && !keyLeft && !keyRight && !keyDown) {
+            float angle = rotation.y;
+            Vector3f newPosition = new Vector3f(position);
+            float hypotenuse = (walkingSpeed * 0.0002f) * delta; //prepona
+            float adjacent = hypotenuse * (float) Math.cos(Math.toRadians(angle)); //prilehly
+            float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse); //protejsi
+            newPosition.z += adjacent;
+            newPosition.x -= opposite;
+            position.z = newPosition.z;
+            position.x = newPosition.x;
+        }
+        
+        if (keyDown && keyLeft && !keyRight && !keyUp) {
+            float angle = rotation.y - 135;
+            Vector3f newPosition = new Vector3f(position);
+            float hypotenuse = (walkingSpeed * 0.0002f) * delta;
+            float adjacent = hypotenuse * (float) Math.cos(Math.toRadians(angle));
+            float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
+            newPosition.z += adjacent;
+            newPosition.x -= opposite;
+            position.z = newPosition.z;
+            position.x = newPosition.x;
+        }
+        
+        if (keyDown && keyRight && !keyLeft && !keyUp) {
+            float angle = rotation.y + 135;
+            Vector3f newPosition = new Vector3f(position);
+            float hypotenuse = (walkingSpeed * 0.0002f) * delta;
+            float adjacent = hypotenuse * (float) Math.cos(Math.toRadians(angle));
+            float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
+            newPosition.z += adjacent;
+            newPosition.x -= opposite;
+            position.z = newPosition.z;
+            position.x = newPosition.x;
+        }
+        
+        if (keyDown && !keyUp && !keyLeft && !keyRight) {
+            float angle = rotation.y;
+            Vector3f newPosition = new Vector3f(position);
+            float hypotenuse = -(walkingSpeed * 0.0002f) * delta;
+            float adjacent = hypotenuse * (float) Math.cos(Math.toRadians(angle));
+            float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
+            newPosition.z += adjacent;
+            newPosition.x -= opposite;
+            position.z = newPosition.z;
+            position.x = newPosition.x;
+        }
+        
+        if (keyLeft && !keyRight && !keyUp && !keyDown) {
+            float angle = rotation.y - 90;
+            Vector3f newPosition = new Vector3f(position);
+            float hypotenuse = (walkingSpeed * 0.0002f) * delta;
+            float adjacent = hypotenuse * (float) Math.cos(Math.toRadians(angle));
+            float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
+            newPosition.z += adjacent;
+            newPosition.x -= opposite;
+            position.z = newPosition.z;
+            position.x = newPosition.x;
+        }
+        
+        if (keyRight && !keyLeft && !keyUp && !keyDown) {
+            float angle = rotation.y + 90;
+            Vector3f newPosition = new Vector3f(position);
+            float hypotenuse = (walkingSpeed * 0.0002f) * delta;
+            float adjacent = hypotenuse * (float) Math.cos(Math.toRadians(angle));
+            float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
+            newPosition.z += adjacent;
+            newPosition.x -= opposite;
+            position.z = newPosition.z;
+            position.x = newPosition.x;
+        }
     }
     
     private static void render(){
