@@ -24,23 +24,17 @@ import java.util.logging.Logger;
 import org.lwjgl.opengl.ARBTextureRg;
 
 import static org.lwjgl.opengl.GL11.*;
+import org.lwjgl.opengl.GL15;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 //import org.newdawn.slick.opengl.Texture;
 //import org.newdawn.slick.opengl.TextureLoader;
 
-/**
- * A LWJGL port of the awesome MineFront Pre-ALPHA 0.02 Controls: W/UP = forward; A/LEFT = strafe left; D/RIGHT = strafe
- * right; S/DOWN = backward; SPACE = fly up; SHIFT = fly down; CONTROL = move faster; TAB = move slower; Q = increase
- * walking speed; Z = decrease walking speed; O = increase mouse speed; L = decrease mouse speed; C = reset position
- *
- * @author Oskar Veerhoek, Yan Chernikov
- */
 public class shooterGame {
-    private static final int WIDTH = 800;
-    private static final int HEIGHT = 600;
+    private static final int WIDTH = 1280;
+    private static final int HEIGHT = 720;
     private static boolean VSync = true;
-    private static int SyncFPS = 60;
-    private static float fov = 50;
+    private static int SyncFPS = 60; 
+    private static float fov = 75;
     private static float aspectRatio = WIDTH / HEIGHT;
     private static float zNear = 0.001f;
     private static float zFar = 100f;
@@ -63,15 +57,17 @@ public class shooterGame {
     
     private static float ceilingHeight = 3f;
     private static float floorHeight = -1f;
-    private static float gridSize = 10f;
-    private static float tileSize = 0.02f;
+    private static float gridSizeX = 10f;
+    private static float gridSizeY = ceilingHeight-Math.abs(floorHeight);
+    private static float gridSizeZ = 5f;
+    private static float texSize = 1f;
     
     private static Vector3f position = new Vector3f(0, 0, 0);
     private static Vector3f rotation = new Vector3f(0, 0, 0);
     private static float walkingSpeed = 15f;
     private static float mouseSpeed = 1f;
-    private static float maxLookUp = 80f;
-    private static float maxLookDown = -80f;
+    private static float maxLookUp = 85f;
+    private static float maxLookDown = -85f;
     
     public shooterGame(){
         
@@ -167,88 +163,82 @@ public class shooterGame {
             }
         }
         
-                
+        // Ceiling
         ceilingDisplayList = glGenLists(1);
         glNewList(ceilingDisplayList, GL_COMPILE);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0);
-        glVertex3f(-gridSize, ceilingHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, 0);
-        glVertex3f(gridSize, ceilingHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
-        glVertex3f(gridSize, ceilingHeight, gridSize);
-        glTexCoord2f(0, gridSize * 10 * tileSize);
-        glVertex3f(-gridSize, ceilingHeight, gridSize);
+        glVertex3f(-gridSizeX, ceilingHeight, -gridSizeZ);
+        glTexCoord2f(gridSizeX*texSize, 0);
+        glVertex3f(gridSizeX, ceilingHeight, -gridSizeZ);
+        glTexCoord2f(gridSizeX*texSize, gridSizeZ*texSize);
+        glVertex3f(gridSizeX, ceilingHeight, gridSizeZ);
+        glTexCoord2f(0, gridSizeZ*texSize);
+        glVertex3f(-gridSizeX, ceilingHeight, gridSizeZ);
         glEnd();
         glEndList();
-        
         wallDisplayList = glGenLists(1);
         glNewList(wallDisplayList, GL_COMPILE);
 
         glBegin(GL_QUADS);
-
         // North wall
-
         glTexCoord2f(0, 0);
-        glVertex3f(-gridSize, floorHeight, -gridSize);
-        glTexCoord2f(0, gridSize * 40 * tileSize);
-        glVertex3f(gridSize, floorHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 40 * tileSize);
-        glVertex3f(gridSize, ceilingHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, 0);
-        glVertex3f(-gridSize, ceilingHeight, -gridSize);
-
+        glVertex3f(gridSizeX, floorHeight, -gridSizeZ);
+        glTexCoord2f(0,gridSizeY*texSize);
+        glVertex3f(gridSizeX, ceilingHeight, -gridSizeZ);
+        glTexCoord2f(gridSizeX*texSize,gridSizeY*texSize);
+        glVertex3f(-gridSizeX, ceilingHeight, -gridSizeZ);
+        glTexCoord2f(gridSizeX*texSize, 0);
+        glVertex3f(-gridSizeX, floorHeight, -gridSizeZ);
+        
         // West wall
-
         glTexCoord2f(0, 0);
-        glVertex3f(-gridSize, floorHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, 0);
-        glVertex3f(-gridSize, ceilingHeight, -gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 40 * tileSize);
-        glVertex3f(-gridSize, ceilingHeight, +gridSize);
-        glTexCoord2f(0, gridSize * 40 * tileSize);
-        glVertex3f(-gridSize, floorHeight, +gridSize);
-
+        glVertex3f(-gridSizeX,floorHeight,-gridSizeZ);
+        glTexCoord2f(0, gridSizeY*texSize);
+        glVertex3f(-gridSizeX,ceilingHeight,-gridSizeZ);
+        glTexCoord2f(gridSizeZ*texSize, gridSizeY*texSize);
+        glVertex3f(-gridSizeX,ceilingHeight,gridSizeZ);
+        glTexCoord2f(gridSizeZ*texSize, 0);
+        glVertex3f(-gridSizeX,floorHeight,gridSizeZ);
+        
         // East wall
-
         glTexCoord2f(0, 0);
-        glVertex3f(+gridSize, floorHeight, -gridSize);
-        glTexCoord2f(gridSize * 40 * tileSize, 0);
-        glVertex3f(+gridSize, floorHeight, +gridSize);
-        glTexCoord2f(gridSize * 40 * tileSize, gridSize * 10 * tileSize);
-        glVertex3f(+gridSize, ceilingHeight, +gridSize);
-        glTexCoord2f(0, gridSize * 10 * tileSize);
-        glVertex3f(+gridSize, ceilingHeight, -gridSize);
-
+        glVertex3f(gridSizeX,floorHeight,gridSizeZ);
+        glTexCoord2f(0, gridSizeY*texSize);
+        glVertex3f(gridSizeX,ceilingHeight,gridSizeZ);
+        glTexCoord2f(gridSizeZ*texSize, gridSizeY*texSize);
+        glVertex3f(gridSizeX,ceilingHeight,-gridSizeZ);
+        glTexCoord2f(gridSizeZ*texSize, 0);
+        glVertex3f(gridSizeX,floorHeight,-gridSizeZ);
+        
+        
         // South wall
-
         glTexCoord2f(0, 0);
-        glVertex3f(-gridSize, floorHeight, +gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, 0);
-        glVertex3f(-gridSize, ceilingHeight, +gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 40 * tileSize);
-        glVertex3f(+gridSize, ceilingHeight, +gridSize);
-        glTexCoord2f(0, gridSize * 40 * tileSize);
-        glVertex3f(+gridSize, floorHeight, +gridSize);
-
+        glVertex3f(-gridSizeX,floorHeight, gridSizeZ);
+        glTexCoord2f(0, gridSizeY*texSize);
+        glVertex3f(-gridSizeX, ceilingHeight, gridSizeZ);
+        glTexCoord2f(gridSizeX*texSize, gridSizeY*texSize);
+        glVertex3f(gridSizeX, ceilingHeight, gridSizeZ);
+        glTexCoord2f(gridSizeX*texSize, 0);
+        glVertex3f(gridSizeX,floorHeight, gridSizeZ);
+        
         glEnd();
-
         glEndList();
 
+        // Floor
         floorDisplayList = glGenLists(1);
         glNewList(floorDisplayList, GL_COMPILE);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0);
-        glVertex3f(-gridSize, floorHeight, -gridSize);
-        glTexCoord2f(0, gridSize * 10 * tileSize);
-        glVertex3f(-gridSize, floorHeight, gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, gridSize * 10 * tileSize);
-        glVertex3f(gridSize, floorHeight, gridSize);
-        glTexCoord2f(gridSize * 10 * tileSize, 0);
-        glVertex3f(gridSize, floorHeight, -gridSize);
+        glVertex3f(gridSizeX, floorHeight, gridSizeZ);
+        glTexCoord2f(0, gridSizeZ*texSize);
+        glVertex3f(gridSizeX, floorHeight, -gridSizeZ);
+        glTexCoord2f(gridSizeX*texSize, gridSizeZ*texSize);
+        glVertex3f(-gridSizeX, floorHeight, -gridSizeZ);
+        glTexCoord2f(gridSizeX*texSize, 0);
+        glVertex3f(-gridSizeX, floorHeight, gridSizeZ);
         glEnd();
         glEndList();
-        
         
     }
     private static void destroyGL(){
@@ -293,9 +283,23 @@ public class shooterGame {
         boolean keyDown = Keyboard.isKeyDown(Keyboard.KEY_DOWN) || Keyboard.isKeyDown(Keyboard.KEY_S);
         boolean keyLeft = Keyboard.isKeyDown(Keyboard.KEY_LEFT) || Keyboard.isKeyDown(Keyboard.KEY_A);
         boolean keyRight = Keyboard.isKeyDown(Keyboard.KEY_RIGHT) || Keyboard.isKeyDown(Keyboard.KEY_D);
-        boolean flyUp = Keyboard.isKeyDown(Keyboard.KEY_SPACE);
-        boolean flyDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
         boolean esc = Keyboard.isKeyDown(Keyboard.KEY_ESCAPE);
+        boolean run = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+        boolean crouch = Keyboard.isKeyDown(Keyboard.KEY_C);
+        
+        if(crouch){
+            position.y = 0.5f;
+        }
+        else{
+            position.y = 0f;
+        }
+        
+        if(run){
+            walkingSpeed = 30f;
+        }
+        else{
+            walkingSpeed = 15f;
+        }
         
         if (esc) {
                 exit=true;
@@ -414,7 +418,7 @@ public class shooterGame {
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glBindTexture(GL_TEXTURE_2D, 0);
-        
+
         glLoadIdentity();
         glRotatef(rotation.x, 1, 0, 0);
         glRotatef(rotation.y, 0, 1, 0);
