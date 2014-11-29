@@ -105,11 +105,11 @@ public class shooterGame {
         fps++;
     }
     
-    private static void initTexture(String path,int texture){
-        texture = glGenTextures();
+    private static int initTexture(TextureType type){
+        int texture = glGenTextures();
         InputStream in = null;
         try{
-            in = new FileInputStream("src/res/floor.png");
+            in = new FileInputStream(type.location);
             PNGDecoder decoder = new PNGDecoder(in);
             ByteBuffer buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
             decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
@@ -138,6 +138,7 @@ public class shooterGame {
                 }
             }
         }
+        return texture;
     }
     
     private static void initGL(){
@@ -152,66 +153,9 @@ public class shooterGame {
 
         glEnable(GL_TEXTURE_2D);
         
-        floor = glGenTextures();
-        wall = glGenTextures();
-        ceiling = glGenTextures();
-        InputStream in = null;
-        try{
-            in = new FileInputStream("src/res/floor.png");
-            PNGDecoder decoder = new PNGDecoder(in);
-            ByteBuffer buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
-            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
-            buffer.flip();
-            
-            glBindTexture(GL_TEXTURE_2D, floor);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, 
-                    GL_UNSIGNED_BYTE, buffer);
-            
-            in = new FileInputStream("src/res/stone_wall.png");
-            decoder = new PNGDecoder(in);
-            buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
-            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
-            buffer.flip();
-            
-            glBindTexture(GL_TEXTURE_2D, wall);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, 
-                    GL_UNSIGNED_BYTE, buffer);
-            
-            in = new FileInputStream("src/res/ceiling.png");
-            decoder = new PNGDecoder(in);
-            buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
-            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
-            buffer.flip();
-            
-            glBindTexture(GL_TEXTURE_2D, ceiling);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, 
-                    GL_UNSIGNED_BYTE, buffer);
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            
-        }catch(FileNotFoundException ex){
-            System.out.println("Failed to find the textures files.");
-            ex.printStackTrace();
-            endGame();
-        }catch(IOException ex){
-            System.out.println("Failed to load the texture file");
-            ex.printStackTrace();
-            endGame();
-        }finally{
-            if(in != null){
-                try{
-                    in.close();
-                }catch(IOException ex){
-                    ex.printStackTrace();
-                }
-            }
-        }
+        floor = initTexture(TextureType.FLOOR);
+        wall = initTexture(TextureType.WALL);
+        ceiling = initTexture(TextureType.CEILING);
         
         // Ceiling
         ceilingDisplayList = glGenLists(1);
@@ -509,7 +453,7 @@ public class shooterGame {
         Display.update();
         Display.sync(SyncFPS);
     }
-    
+
     public static void gameLoop(){
         initGL();
         getDelta();
