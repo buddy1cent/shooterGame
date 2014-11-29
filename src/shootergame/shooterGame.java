@@ -11,6 +11,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.vector.Vector3f;
 //import org.newdawn.slick.Color;
+import org.newdawn.slick.opengl.PNGDecoder;
 
 
 import java.io.FileInputStream;
@@ -53,11 +54,10 @@ public class shooterGame {
     private static int ceilingDisplayList;
     private static int wallDisplayList;
     private static int floorDisplayList;
-   
     
     private static float ceilingHeight = 3f;
     private static float floorHeight = -1f;
-    private static float gridSizeX = 10f;
+    private static float gridSizeX = 5f;
     private static float gridSizeY = ceilingHeight-Math.abs(floorHeight);
     private static float gridSizeZ = 5f;
     private static float texSize = 1f;
@@ -105,6 +105,41 @@ public class shooterGame {
         fps++;
     }
     
+    private static void initTexture(String path,int texture){
+        texture = glGenTextures();
+        InputStream in = null;
+        try{
+            in = new FileInputStream("src/res/floor.png");
+            PNGDecoder decoder = new PNGDecoder(in);
+            ByteBuffer buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
+            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
+            buffer.flip();
+            
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, 
+                    GL_UNSIGNED_BYTE, buffer);
+            
+        }catch(FileNotFoundException ex){
+            System.out.println("Failed to find the textures files.");
+            ex.printStackTrace();
+            endGame();
+        }catch(IOException ex){
+            System.out.println("Failed to load the texture file");
+            ex.printStackTrace();
+            endGame();
+        }finally{
+            if(in != null){
+                try{
+                    in.close();
+                }catch(IOException ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+    
     private static void initGL(){
         
         position = new Vector3f();
@@ -118,12 +153,14 @@ public class shooterGame {
         glEnable(GL_TEXTURE_2D);
         
         floor = glGenTextures();
+        wall = glGenTextures();
+        ceiling = glGenTextures();
         InputStream in = null;
         try{
             in = new FileInputStream("src/res/floor.png");
             PNGDecoder decoder = new PNGDecoder(in);
             ByteBuffer buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
-            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
+            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
             buffer.flip();
             
             glBindTexture(GL_TEXTURE_2D, floor);
@@ -135,7 +172,7 @@ public class shooterGame {
             in = new FileInputStream("src/res/stone_wall.png");
             decoder = new PNGDecoder(in);
             buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
-            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
+            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
             buffer.flip();
             
             glBindTexture(GL_TEXTURE_2D, wall);
@@ -143,7 +180,20 @@ public class shooterGame {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, 
                     GL_UNSIGNED_BYTE, buffer);
+            
+            in = new FileInputStream("src/res/ceiling.png");
+            decoder = new PNGDecoder(in);
+            buffer = BufferUtils.createByteBuffer(4 * decoder.getWidth() * decoder.getHeight());
+            decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
+            buffer.flip();
+            
+            glBindTexture(GL_TEXTURE_2D, ceiling);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, 
+                    GL_UNSIGNED_BYTE, buffer);
             glBindTexture(GL_TEXTURE_2D, 0);
+
             
         }catch(FileNotFoundException ex){
             System.out.println("Failed to find the textures files.");
@@ -278,7 +328,9 @@ public class shooterGame {
                 rotation.x = maxLookUp;
             }
         }
-       
+        
+        walkingSpeed = 15f;
+        
         boolean keyUp = Keyboard.isKeyDown(Keyboard.KEY_UP) || Keyboard.isKeyDown(Keyboard.KEY_W);
         boolean keyDown = Keyboard.isKeyDown(Keyboard.KEY_DOWN) || Keyboard.isKeyDown(Keyboard.KEY_S);
         boolean keyLeft = Keyboard.isKeyDown(Keyboard.KEY_LEFT) || Keyboard.isKeyDown(Keyboard.KEY_A);
@@ -286,19 +338,44 @@ public class shooterGame {
         boolean esc = Keyboard.isKeyDown(Keyboard.KEY_ESCAPE);
         boolean run = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
         boolean crouch = Keyboard.isKeyDown(Keyboard.KEY_C);
+        boolean jump = Keyboard.isKeyDown(Keyboard.KEY_SPACE);
+        boolean jumping = false;
+        boolean up = true;
         
-        if(crouch){
-            position.y = 0.5f;
-        }
-        else{
-            position.y = 0f;
+        if(jump){
+            jumping = true;
         }
         
+        if(jumping){
+            if(position.y == -2f)
+                up = false;
+            if(position.y < 1f && up){
+                position.y -= 0.05f;
+                System.out.println("X: " + position.x + " ,Y: " + position.y + " ,Z: " + position.z);
+            }
+            if(!up)
+                position.y += 0.07f;
+            if(position.y == 0 && !up){
+                jumping = false;
+                up = true;
+            }
+        }
+
+        if(crouch && !jumping){
+            if(position.y < 0.5f)
+                position.y += 0.05f;
+            if(position.y > 0.5f)
+                position.y = 0.5f;
+            walkingSpeed = 6f;
+        }
+        else if(!jumping){
+            if(position.y > 0f)
+                position.y -= 0.05f;
+            if(position.y < 0f)
+                position.y = 0f;
+        }
         if(run){
-            walkingSpeed = 30f;
-        }
-        else{
-            walkingSpeed = 15f;
+            walkingSpeed *= 2f;
         }
         
         if (esc) {
@@ -405,16 +482,20 @@ public class shooterGame {
     private static void render(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindTexture(GL_TEXTURE_2D, floor);
+        
         
         glEnable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
+        
+        glBindTexture(GL_TEXTURE_2D, floor);
         glCallList(floorDisplayList);
+        
+        glBindTexture(GL_TEXTURE_2D, ceiling);
         glCallList(ceilingDisplayList);
         
         glBindTexture(GL_TEXTURE_2D, wall);
-        
         glCallList(wallDisplayList);
+        
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glBindTexture(GL_TEXTURE_2D, 0);
