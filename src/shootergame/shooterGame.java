@@ -140,6 +140,14 @@ public class shooterGame {
         }
         return texture;
     }
+    private static final int amountOfVertices = 4;
+    private static final int vertexSize = 3;
+    private static final int colorSize = 2;
+    private static FloatBuffer vertexCeiling;
+    private static FloatBuffer texCoordCeiling;
+    private static FloatBuffer vertexWalls,vertexWallWest,vertexWallEast,vertexWallSouth;
+    private static FloatBuffer texCoordWalls;
+    private static FloatBuffer vertexFloor;
     
     private static void initGL(){
         
@@ -152,88 +160,73 @@ public class shooterGame {
         glLoadIdentity();
 
         glEnable(GL_TEXTURE_2D);
-        
+        // Load textures
         floor = initTexture(TextureType.FLOOR);
         wall = initTexture(TextureType.WALL);
         ceiling = initTexture(TextureType.CEILING);
-        
-        // Ceiling
-        ceilingDisplayList = glGenLists(1);
-        glNewList(ceilingDisplayList, GL_COMPILE);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0);
-        glVertex3f(-gridSizeX, ceilingHeight, -gridSizeZ);
-        glTexCoord2f(gridSizeX*texSize, 0);
-        glVertex3f(gridSizeX, ceilingHeight, -gridSizeZ);
-        glTexCoord2f(gridSizeX*texSize, gridSizeZ*texSize);
-        glVertex3f(gridSizeX, ceilingHeight, gridSizeZ);
-        glTexCoord2f(0, gridSizeZ*texSize);
-        glVertex3f(-gridSizeX, ceilingHeight, gridSizeZ);
-        glEnd();
-        glEndList();
-        wallDisplayList = glGenLists(1);
-        glNewList(wallDisplayList, GL_COMPILE);
 
-        glBegin(GL_QUADS);
-        // North wall
-        glTexCoord2f(0, 0);
-        glVertex3f(gridSizeX, floorHeight, -gridSizeZ);
-        glTexCoord2f(0,gridSizeY*texSize);
-        glVertex3f(gridSizeX, ceilingHeight, -gridSizeZ);
-        glTexCoord2f(gridSizeX*texSize,gridSizeY*texSize);
-        glVertex3f(-gridSizeX, ceilingHeight, -gridSizeZ);
-        glTexCoord2f(gridSizeX*texSize, 0);
-        glVertex3f(-gridSizeX, floorHeight, -gridSizeZ);
-        
-        // West wall
-        glTexCoord2f(0, 0);
-        glVertex3f(-gridSizeX,floorHeight,-gridSizeZ);
-        glTexCoord2f(0, gridSizeY*texSize);
-        glVertex3f(-gridSizeX,ceilingHeight,-gridSizeZ);
-        glTexCoord2f(gridSizeZ*texSize, gridSizeY*texSize);
-        glVertex3f(-gridSizeX,ceilingHeight,gridSizeZ);
-        glTexCoord2f(gridSizeZ*texSize, 0);
-        glVertex3f(-gridSizeX,floorHeight,gridSizeZ);
-        
-        // East wall
-        glTexCoord2f(0, 0);
-        glVertex3f(gridSizeX,floorHeight,gridSizeZ);
-        glTexCoord2f(0, gridSizeY*texSize);
-        glVertex3f(gridSizeX,ceilingHeight,gridSizeZ);
-        glTexCoord2f(gridSizeZ*texSize, gridSizeY*texSize);
-        glVertex3f(gridSizeX,ceilingHeight,-gridSizeZ);
-        glTexCoord2f(gridSizeZ*texSize, 0);
-        glVertex3f(gridSizeX,floorHeight,-gridSizeZ);
-        
-        
-        // South wall
-        glTexCoord2f(0, 0);
-        glVertex3f(-gridSizeX,floorHeight, gridSizeZ);
-        glTexCoord2f(0, gridSizeY*texSize);
-        glVertex3f(-gridSizeX, ceilingHeight, gridSizeZ);
-        glTexCoord2f(gridSizeX*texSize, gridSizeY*texSize);
-        glVertex3f(gridSizeX, ceilingHeight, gridSizeZ);
-        glTexCoord2f(gridSizeX*texSize, 0);
-        glVertex3f(gridSizeX,floorHeight, gridSizeZ);
-        
-        glEnd();
-        glEndList();
+        // Ceiling
+        vertexCeiling = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize);
+        vertexCeiling.put(new float[]{
+            -gridSizeX, ceilingHeight,  -gridSizeZ,
+            gridSizeX,  ceilingHeight,  -gridSizeZ,
+            gridSizeX,  ceilingHeight,  gridSizeZ,
+            -gridSizeX, ceilingHeight,  gridSizeZ,
+        });
+        vertexCeiling.flip();
 
         // Floor
-        floorDisplayList = glGenLists(1);
-        glNewList(floorDisplayList, GL_COMPILE);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0);
-        glVertex3f(gridSizeX, floorHeight, gridSizeZ);
-        glTexCoord2f(0, gridSizeZ*texSize);
-        glVertex3f(gridSizeX, floorHeight, -gridSizeZ);
-        glTexCoord2f(gridSizeX*texSize, gridSizeZ*texSize);
-        glVertex3f(-gridSizeX, floorHeight, -gridSizeZ);
-        glTexCoord2f(gridSizeX*texSize, 0);
-        glVertex3f(-gridSizeX, floorHeight, gridSizeZ);
-        glEnd();
-        glEndList();
+        vertexFloor = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize);
+        vertexFloor.put(new float[]{
+            gridSizeX,  floorHeight,    gridSizeZ,
+            gridSizeX,  floorHeight,    -gridSizeZ,
+            -gridSizeX, floorHeight,    -gridSizeZ,        
+            -gridSizeX, floorHeight,    gridSizeZ,
+        });
+        vertexFloor.flip();
         
+        // Texture Coords Ceiling/Floor
+        texCoordCeiling = BufferUtils.createFloatBuffer(amountOfVertices * colorSize);
+        texCoordCeiling.put(new float[]{
+            0, 0, gridSizeX*texSize, 0, gridSizeX*texSize, gridSizeZ*texSize, 0, gridSizeZ*texSize
+        });
+        texCoordCeiling.flip();
+        
+        // Walls
+        vertexWalls = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize * 4);
+        vertexWalls.put(new float[]{
+            // North wall
+            gridSizeX,  floorHeight,    -gridSizeZ,
+            gridSizeX,  ceilingHeight,  -gridSizeZ,
+            -gridSizeX, ceilingHeight,  -gridSizeZ,
+            -gridSizeX, floorHeight,    -gridSizeZ,
+            // West wall
+            -gridSizeX, floorHeight,    -gridSizeZ,
+            -gridSizeX, ceilingHeight,  -gridSizeZ,
+            -gridSizeX, ceilingHeight,  gridSizeZ,
+            -gridSizeX, floorHeight,    gridSizeZ,
+            // East wall
+            gridSizeX,  floorHeight,    gridSizeZ,
+            gridSizeX,  ceilingHeight,  gridSizeZ,
+            gridSizeX,  ceilingHeight,  -gridSizeZ,
+            gridSizeX,  floorHeight,    -gridSizeZ,
+            // South wall
+            -gridSizeX, floorHeight,    gridSizeZ,
+            -gridSizeX, ceilingHeight,  gridSizeZ,
+            gridSizeX,  ceilingHeight,  gridSizeZ,
+            gridSizeX,  floorHeight,    gridSizeZ,
+        });
+        vertexWalls.flip();
+        
+        // Texture coords walls
+        texCoordWalls = BufferUtils.createFloatBuffer(amountOfVertices * colorSize * 4);
+        texCoordWalls.put(new float[]{
+            0, 0, 0, gridSizeY*texSize, gridSizeX*texSize, gridSizeY*texSize, gridSizeX*texSize, 0,
+            0, 0, 0, gridSizeY*texSize, gridSizeX*texSize, gridSizeY*texSize, gridSizeX*texSize, 0,
+            0, 0, 0, gridSizeY*texSize, gridSizeX*texSize, gridSizeY*texSize, gridSizeX*texSize, 0,
+            0, 0, 0, gridSizeY*texSize, gridSizeX*texSize, gridSizeY*texSize, gridSizeX*texSize, 0,
+        });
+        texCoordWalls.flip();  
     }
     private static void destroyGL(){
         glDeleteTextures(floor);
@@ -425,20 +418,28 @@ public class shooterGame {
     
     private static void render(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        /*Vertex Array */
         
-        
-        glEnable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
-        
-        glBindTexture(GL_TEXTURE_2D, floor);
-        glCallList(floorDisplayList);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         
         glBindTexture(GL_TEXTURE_2D, ceiling);
-        glCallList(ceilingDisplayList);
+        glVertexPointer(vertexSize, 0, vertexCeiling);
+        glTexCoordPointer(colorSize, 0, texCoordCeiling);
+        glDrawArrays(GL_QUADS, 0, amountOfVertices);
+        
+        glBindTexture(GL_TEXTURE_2D, floor);
+        glVertexPointer(vertexSize, 0, vertexFloor);
+        glDrawArrays(GL_QUADS, 0, amountOfVertices);
+        
         
         glBindTexture(GL_TEXTURE_2D, wall);
-        glCallList(wallDisplayList);
+        glVertexPointer(vertexSize, 0, vertexWalls);
+        glTexCoordPointer(colorSize, 0, texCoordWalls);
+        glDrawArrays(GL_QUADS, 0, amountOfVertices * 4);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
