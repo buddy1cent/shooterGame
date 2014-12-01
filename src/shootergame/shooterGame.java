@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.opengl.ARBTextureRg;
@@ -47,25 +49,33 @@ public class shooterGame {
     
     private static boolean exit = false;
     
+    private static List<Integer> textures;
     private static int floor;
     private static int wall;
     private static int ceiling;
     private static int box;
     
-    private static int ceilingDisplayList;
-    private static int wallDisplayList;
-    private static int floorDisplayList;
-    private static int boxDisplayList;
+        private static final int amountOfVertices = 4;
+    private static final int vertexSize = 3;
+    private static final int colorSize = 2;
+    private static FloatBuffer vertexCeiling;
+    private static FloatBuffer texCoordCeiling;
+    private static FloatBuffer vertexWalls,vertexWallWest,vertexWallEast,vertexWallSouth;
+    private static FloatBuffer texCoordWalls;
+    private static FloatBuffer vertexFloor;
+    private static FloatBuffer vertexBox;
+    private static FloatBuffer texCoordBox;
     
-    private static float ceilingHeight = 3f;
+    private static float ceilingHeight = 5f;
     private static float floorHeight = -1f;
-    private static float gridSizeX = 5f;
+    private static float gridSizeX = 5f;   
     private static float maxSizeX = gridSizeX - 0.5f;
-    private static float boxSize = 0.5f;
     private static float gridSizeY = ceilingHeight-Math.abs(floorHeight);
     private static float gridSizeZ = 5f;
     private static float maxSizeZ = gridSizeZ - 0.5f;
     private static float texSize = 1f;
+    
+    private static float boxSize = 0.2f;
     
     private static Vector3f position = new Vector3f(0, 0, 0);
     private static Vector3f rotation = new Vector3f(0, 0, 0);
@@ -123,8 +133,8 @@ public class shooterGame {
             buffer.flip();
             
             glBindTexture(GL_TEXTURE_2D, texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, 
                     GL_UNSIGNED_BYTE, buffer);
             
@@ -145,19 +155,10 @@ public class shooterGame {
                 }
             }
         }
+        textures.add(texture);
         return texture;
     }
-    private static final int amountOfVertices = 4;
-    private static final int vertexSize = 3;
-    private static final int colorSize = 2;
-    private static FloatBuffer vertexCeiling;
-    private static FloatBuffer texCoordCeiling;
-    private static FloatBuffer vertexWalls,vertexWallWest,vertexWallEast,vertexWallSouth;
-    private static FloatBuffer texCoordWalls;
-    private static FloatBuffer vertexFloor;
-    private static FloatBuffer vertexBox;
-    private static FloatBuffer texCoordBox;
-    
+   
     private static void initGL(){
         
         position = new Vector3f();
@@ -170,6 +171,7 @@ public class shooterGame {
 
         glEnable(GL_TEXTURE_2D);
         // Load textures
+        textures = new ArrayList<>();
         floor = initTexture(TextureType.FLOOR);
         wall = initTexture(TextureType.WALL);
         ceiling = initTexture(TextureType.CEILING);
@@ -276,12 +278,9 @@ public class shooterGame {
         
     }
     private static void destroyGL(){
-        glDeleteTextures(floor);
-        glDeleteTextures(wall);
-        glDeleteTextures(box);
-        glDeleteLists(floorDisplayList, 1);
-        glDeleteLists(ceilingDisplayList, 1);
-        glDeleteLists(wallDisplayList, 1);
+        for(int tex: textures){
+            glDeleteTextures(tex);
+        }
     }
     
     private static void input(){
@@ -489,8 +488,10 @@ public class shooterGame {
     }
     private static void render(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        /*Vertex Array */
         
+        glEnable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        // Room
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         
@@ -508,6 +509,9 @@ public class shooterGame {
         glTexCoordPointer(colorSize, 0, texCoordWalls);
         glDrawArrays(GL_QUADS, 0, amountOfVertices * 4);
         
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        // Box
         tranSpeed();
         glTranslatef(transSpeed, 0, 0);
         glBindTexture(GL_TEXTURE_2D, box);
@@ -518,10 +522,8 @@ public class shooterGame {
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
         glBindTexture(GL_TEXTURE_2D, 0);
-
+        // Player position
         glLoadIdentity();
         glRotatef(rotation.x, 1, 0, 0);
         glRotatef(rotation.y, 0, 1, 0);
@@ -529,7 +531,8 @@ public class shooterGame {
         glTranslatef(position.x, position.y, position.z);
         
         Display.update();
-        Display.sync(SyncFPS);
+        if(VSync)
+            Display.sync(SyncFPS);
     }
 
     public static void gameLoop(){
