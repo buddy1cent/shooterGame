@@ -50,12 +50,13 @@ public class shooterGame {
     private static boolean exit = false;
     
     private static List<Integer> textures;
+    private static List<box> boxes;
     private static int floor;
     private static int wall;
     private static int ceiling;
     private static int box;
     
-        private static final int amountOfVertices = 4;
+    private static final int amountOfVertices = 4;
     private static final int vertexSize = 3;
     private static final int colorSize = 2;
     private static FloatBuffer vertexCeiling;
@@ -65,6 +66,8 @@ public class shooterGame {
     private static FloatBuffer vertexFloor;
     private static FloatBuffer vertexBox;
     private static FloatBuffer texCoordBox;
+    private static box a ;
+    private static box b ;
     
     private static float ceilingHeight = 5f;
     private static float floorHeight = -1f;
@@ -75,11 +78,9 @@ public class shooterGame {
     private static float maxSizeZ = gridSizeZ - 0.5f;
     private static float texSize = 1f;
     
-    private static float boxSize = 0.2f;
-    
     private static Vector3f position = new Vector3f(0, 0, 0);
     private static Vector3f rotation = new Vector3f(0, 0, 0);
-    private static float transSpeed = 0f;
+    private static float moveSpeed = 0f;
     private static float x = 0.01f;
     private static float walkingSpeed = 15f;
     private static float mouseSpeed = 1f;
@@ -161,7 +162,12 @@ public class shooterGame {
    
     private static void initGL(){
         
+        boxes = new ArrayList<>();
         position = new Vector3f();
+        a = new box(3f,0f,1f,.2f,.2f,.2f);
+        b = new box(0f,1f,1f,.5f,.5f,.5f);
+        boxes.add(a);
+        boxes.add(b);
         
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -176,6 +182,15 @@ public class shooterGame {
         wall = initTexture(TextureType.WALL);
         ceiling = initTexture(TextureType.CEILING);
         box = initTexture(TextureType.BOX);
+        for(box x: boxes){
+            x.setTexture(box);
+            x.setGameParam(vertexSize, colorSize, amountOfVertices, texSize); 
+            x.getPosition();
+        }
+        /*a.setTexture(box);
+        a.setGameParam(vertexSize, colorSize, amountOfVertices, texSize);
+        b.setTexture(box);
+        b.setGameParam(vertexSize, colorSize, amountOfVertices, texSize);*/
 
         // Ceiling
         vertexCeiling = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize);
@@ -241,40 +256,47 @@ public class shooterGame {
         texCoordWalls.flip();  
         
         // Box
-        vertexBox = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize *4);
+        /*vertexBox = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize *5);
         vertexBox.put(new float[]{
             // North 
             boxSize,  floorHeight,    -boxSize,
-            boxSize,  boxSize*1.5f,  -boxSize,
-            -boxSize, boxSize*1.5f,  -boxSize,
+            boxSize,  boxSize,  -boxSize,
+            -boxSize, boxSize,  -boxSize,
             -boxSize, floorHeight,    -boxSize,
             // West 
             -boxSize, floorHeight,    -boxSize,
-            -boxSize, boxSize*1.5f,  -boxSize,
-            -boxSize, boxSize*1.5f,  boxSize,
+            -boxSize, boxSize,  -boxSize,
+            -boxSize, boxSize,  boxSize,
             -boxSize, floorHeight,    boxSize,
             // East 
             boxSize,  floorHeight,    boxSize,
-            boxSize,  boxSize*1.5f,  boxSize,
-            boxSize,  boxSize*1.5f,  -boxSize,
+            boxSize,  boxSize,   boxSize,
+            boxSize,  boxSize,  -boxSize,
             boxSize,  floorHeight,    -boxSize,
             // South 
             -boxSize, floorHeight,    boxSize,
-            -boxSize, boxSize*1.5f,  boxSize,
-            boxSize,  boxSize*1.5f,  boxSize,
+            -boxSize, boxSize,  boxSize,
+            boxSize,  boxSize,  boxSize,
             boxSize,  floorHeight,    boxSize,
+            //top
+            -boxSize, boxSize,  -boxSize,
+            boxSize,  boxSize,  -boxSize,
+            boxSize,  boxSize,  boxSize,
+            -boxSize, boxSize,  boxSize,
+            
         });
-        vertexBox.flip();
+        vertexBox.flip();*/
         
         // Texture coords box
-        texCoordBox = BufferUtils.createFloatBuffer(amountOfVertices * colorSize * 4);
+        /*texCoordBox = BufferUtils.createFloatBuffer(amountOfVertices * colorSize * 5);
         texCoordBox.put(new float[]{
-            0, 0, 0, 2*boxSize*texSize, 2*boxSize*texSize, 2*boxSize*texSize,2*boxSize*texSize,0,
-            0, 0, 0, 2*boxSize*texSize, 2*boxSize*texSize, 2*boxSize*texSize,2*boxSize*texSize,0,
-            0, 0, 0, 2*boxSize*texSize, 2*boxSize*texSize, 2*boxSize*texSize,2*boxSize*texSize,0,
-            0, 0, 0, 2*boxSize*texSize, 2*boxSize*texSize, 2*boxSize*texSize,2*boxSize*texSize,0,
+            0, 0, 0, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize,0,
+            0, 0, 0, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize,0,
+            0, 0, 0, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize,0,
+            0, 0, 0, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize,0,
+            0, 0, 4*boxSize*texSize, 0, 4*boxSize*texSize, 4*boxSize*texSize, 0, 4*boxSize*texSize,
         });
-        texCoordBox.flip(); 
+        texCoordBox.flip(); */
         
     }
     private static void destroyGL(){
@@ -477,14 +499,14 @@ public class shooterGame {
             position.x=-maxSizeX;   
         }
     }
-    private static void tranSpeed(){
+    private static void boxMove(){
         
-        if(transSpeed >= 4.5f)
+        if(moveSpeed >= 4.5f)
             x=-0.01f;
-        if(transSpeed <= -4.5f)
+        if(moveSpeed <= -4.5f)
             x=0.01f;
             
-        transSpeed+= x;
+        moveSpeed+= x;
     }
     private static void render(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -509,16 +531,22 @@ public class shooterGame {
         glTexCoordPointer(colorSize, 0, texCoordWalls);
         glDrawArrays(GL_QUADS, 0, amountOfVertices * 4);
         
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
+        
         // Box
-        tranSpeed();
-        glTranslatef(transSpeed, 0, 0);
+        /*boxMove();
+        glTranslatef(moveSpeed, 0, 0);
         glBindTexture(GL_TEXTURE_2D, box);
         glVertexPointer(vertexSize, 0, vertexBox);
         glTexCoordPointer(colorSize, 0, texCoordBox);
-        glDrawArrays(GL_QUADS, 0, amountOfVertices * 4);
-
+        glDrawArrays(GL_QUADS, 0, amountOfVertices * 5);*/
+        
+        for(box q: boxes){
+            q.render();  
+        }
+        /*a.render();
+        b.render();*/
+       
+        //c.render();
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         

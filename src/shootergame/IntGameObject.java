@@ -9,7 +9,7 @@ public interface IntGameObject {
     public void render();
     public void update(int delta);
     public void setPosition(float x,float y, float z);
-    public void getPoistion();
+    public void getPosition();
     /* Location */ 
     public void setX(float x);
     public void setY(float y);
