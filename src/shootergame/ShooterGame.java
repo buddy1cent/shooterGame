@@ -182,7 +182,16 @@ public class ShooterGame {
         room.add(new Wall(gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "E", wall));
         room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "W", wall));
         
-
+        //par
+        room.add(new Wall(-gridSizeX+5f, floorHeight, -gridSizeZ+2, gridSizeX, gridSizeY, "N", ceiling));
+        room.add(new Wall(-gridSizeX+5f, floorHeight, gridSizeZ-18, gridSizeX, gridSizeY, "S", ceiling));
+        
+        /*room.add(new Wall(-gridSizeX+5f, floorHeight+2f, -gridSizeZ-2f, gridSizeX, gridSizeZ, "Floor", wall));
+        room.add(new Wall(-gridSizeX+2f, ceilingHeight-2f, -gridSizeZ, gridSizeX, gridSizeZ, "Ceiling", floor));
+        room.add(new Wall(-gridSizeX+5f, floorHeight, gridSizeZ-2, gridSizeX, gridSizeY, "S", ceiling));
+        room.add(new Wall(gridSizeX-2f, floorHeight, -gridSizeZ+5f, gridSizeX, gridSizeY, "E", ceiling));
+        room.add(new Wall(-gridSizeX+2f, floorHeight, -gridSizeZ+5f, gridSizeX, gridSizeY, "W", ceiling));*/
+        
         boxes = new ArrayList<Box>();
         boxes.add(new Box(6f,-1f,1f,.5f,.5f,.5f,1,box));
         boxes.add(new Box(2f,-1f,1f,.5f,.5f,.5f,1,box));
@@ -380,7 +389,7 @@ public class ShooterGame {
         collideWall();
     }
     private static void collideWall(){
-        if (position.z>=maxSizeZ) {
+        /*if (position.z>=maxSizeZ) {
             position.z=maxSizeZ;   
         }
         if (position.z<=-maxSizeZ) {
@@ -391,7 +400,9 @@ public class ShooterGame {
         }
         if (position.x<=-maxSizeX) {
             position.x=-maxSizeX;   
-        }
+        }*/
+        room.wallIntersect(position);
+            System.out.println("True X: " + position.x + " ,Y: " + position.y + " ,Z: " + position.z);
     }
     private static void boxMove(){
         

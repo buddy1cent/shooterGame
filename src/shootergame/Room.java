@@ -11,14 +11,15 @@ import java.util.List;
 import org.lwjgl.BufferUtils;
 
 import static org.lwjgl.opengl.GL11.*;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
  *
  * @author Buddy-1cent
  */
 public class Room {
-    private List<Wall> walls = new ArrayList<Wall>();
-    
+    private final List<Wall> walls = new ArrayList<Wall>();
+    private final float gap = 0.4f;
     public void add(Wall w){
         w.initGL();
         walls.add(w);
@@ -157,6 +158,49 @@ public class Room {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         
             glBindTexture(GL_TEXTURE_2D, 0);
-        }        
+        }  
+       
+    }
+    public Vector3f wallIntersect(Vector3f position){
+            for(Wall wall: walls){
+                //test zda je za zdi a kdyz je tak jeji testovani vynecha
+                /*if(position.z < (-wall.getZ()+0.1f)){
+                    //testuje jestli se jedna o North a jeji pozici plus jeji sirku
+                    if((wall.facing.compareTo("North") == 0 || wall.facing.compareTo("N") == 0) && position.z >= (-wall.getZ()-gap) && (position.x > wall.getX() && position.x < (wall.getX()+wall.getWidth()) ) ){
+                    position.z = -wall.getZ()-gap;
+                    System.out.println("X: " + position.x + " ,wallx: " + wall.getX() + "    ,Y: " + position.y + " ,wallY: "+ wall.getY() +"    ,Z: " + position.z + " ,wallZ: "+ wall.getZ() + " ,facing: "+ wall.getFacing() +  " ,widht: "+ wall.getWidth());
+                }}*/
+                
+                if((wall.facing.compareTo("North") == 0 || wall.facing.compareTo("N") == 0) && position.z >= (-wall.getZ()-gap) && (position.x > wall.getX() && position.x < (wall.getX()+wall.getWidth()) ) ){
+                    if(position.z < (-wall.getZ()+0.1f)){
+                        position.z = -wall.getZ()-gap;
+                        System.out.println("X: " + position.x + " ,wallx: " + wall.getX() + "    ,Y: " + position.y + " ,wallY: "+ wall.getY() +"    ,Z: " + position.z + " ,wallZ: "+ wall.getZ() + " ,facing: "+ wall.getFacing() +  " ,widht: "+ wall.getWidth());
+                    }
+                } 
+                else if((wall.facing.compareTo("South") == 0 || wall.facing.compareTo("S") == 0) && position.z <= (-wall.getZ()+gap) && (position.x > wall.getX() && position.x < (wall.getX()+wall.getWidth()) )){
+                        if(position.z > (-wall.getZ()-0.1f)){
+                        position.z = -wall.getZ()+gap;
+                    }
+                }
+                else if((wall.facing.compareTo("East") == 0 || wall.facing.compareTo("E") == 0) && position.x <= (-wall.getX()+gap) && (position.z > wall.getZ() && position.z < (wall.getZ()+wall.getWidth()) )){
+                    if(position.x > (-wall.getX()-0.1f)){
+                        position.x = -wall.getX()+gap;
+                        System.out.println("X: " + position.x + " ,wallx: " + wall.getX() + "    ,Y: " + position.y + " ,wallY: "+ wall.getY() +"    ,Z: " + position.z + " ,wallZ: "+ wall.getZ() + " ,facing: "+ wall.getFacing() +  " ,widht: "+ wall.getWidth());
+                    }
+                }
+                else if((wall.facing.compareTo("West") == 0 || wall.facing.compareTo("W") == 0) && position.x >= (-wall.getX()-gap) && (position.z > wall.getZ() && position.z < (wall.getZ()+wall.getWidth()) )){
+                    if(position.x < (-wall.getX()+0.1f)){
+                        position.x = -wall.getX()-gap;
+                    }
+                }
+                else if((wall.facing.compareTo("Ceiling") == 0 || wall.facing.compareTo("C") == 0) && position.y <= (-wall.getY()+gap)  /*&& !(position.z > wall.getZ() && position.z < (wall.getZ()+wall.getWidth()) && position.x > wall.getX() && position.x < (wall.getX()+wall.getWidth()))*/ ){
+                    position.y = -wall.getY()+gap;
+                }
+                else if((wall.facing.compareTo("Floor") == 0 || wall.facing.compareTo("F") == 0) && position.y >= (-wall.getY()-gap) && (position.z > wall.getZ() && position.z < (wall.getZ()+wall.getWidth()) && position.x > wall.getX() && position.x < (wall.getX()+wall.getWidth()))){
+                    position.y = -wall.getY()-gap;
+                    System.out.println("X: " + position.x + " ,wallx: " + wall.getX() + "    ,Y: " + position.y + " ,wallY: "+ wall.getY() +"    ,Z: " + position.z + " ,wallZ: "+ wall.getZ() + " ,facing: "+ wall.getFacing() +  " ,height: "+ wall.getHeight());
+                } 
+            }    
+            return position;
     }
 }
