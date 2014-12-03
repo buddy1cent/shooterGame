@@ -7,17 +7,7 @@ package shootergame;
 
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glTexCoordPointer;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL11.glVertexPointer;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  *
@@ -49,10 +39,16 @@ public class Box extends GameObject{
         
         glBindTexture(GL_TEXTURE_2D, texture);
         
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        
         glVertexPointer(VERTEX_SIZE, 0, vertexBox);
         glTexCoordPointer(TEXTURE_COORD_SIZE, 0, texCoordBox);
         
         glDrawArrays(GL_QUADS, 0, AMOUNT_OF_VERTICES);  
+    
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
     
     @Override

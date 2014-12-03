@@ -137,8 +137,8 @@ public class Room {
             texCoordWall = BufferUtils.createFloatBuffer(AMOUNT_OF_VERTICES * TEXTURE_COORD_SIZE);
             texCoordWall.put(new float[]{
                 0, 0,
-                0, width * TEXTURE_SIZE, 
-                height * TEXTURE_SIZE, height * TEXTURE_SIZE, 
+                0, height * TEXTURE_SIZE, 
+                width * TEXTURE_SIZE, height * TEXTURE_SIZE, 
                 width * TEXTURE_SIZE, 0,
             });
             texCoordWall.flip(); 

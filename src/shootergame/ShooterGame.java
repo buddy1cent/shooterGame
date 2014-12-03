@@ -66,11 +66,11 @@ public class ShooterGame {
     private static Box a,b,c,d ;
     
     
-    private static float ceilingHeight = 10f;
+    private static float ceilingHeight = 5f;
     private static float floorHeight = -1f;
     private static float gridSizeX = 10f;   
     private static float maxSizeX = gridSizeX - 0.5f;
-    private static float gridSizeY = ceilingHeight-Math.abs(floorHeight);
+    private static float gridSizeY = ceilingHeight+Math.abs(floorHeight);
     private static float gridSizeZ = 10f;
     private static float maxSizeZ = gridSizeZ - 0.5f;
     private static float texSize = 1f;
@@ -175,135 +175,23 @@ public class ShooterGame {
         box = initTexture(TextureType.BOX);
         
         room = new Room();
-        room.add(new Wall(0f,-0.5f,-5f,10f,10f,"F",ceiling));
+        room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeZ*2, "Floor", floor));
+        room.add(new Wall(-gridSizeX, ceilingHeight, -gridSizeZ, gridSizeX*2, gridSizeZ*2, "Ceiling", ceiling));
+        room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "N", wall));
+        room.add(new Wall(-gridSizeX, floorHeight, gridSizeZ, gridSizeX*2, gridSizeY, "S", wall));
+        room.add(new Wall(gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "E", wall));
+        room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "W", wall));
+        
 
         boxes = new ArrayList<Box>();
-        
-        d = new Box(6f,-1f,1f,.5f,.5f,.5f,1,box);
-        c = new Box(2f,-1f,1f,.5f,.5f,.5f,1,box);
-        b = new Box(3f,0f,0f,.2f,.2f,.2f,1,box);
-        a = new Box(6f,-1f,1f,.5f,.5f,.5f,1,box);
-        
-        boxes.add(a);
-        boxes.add(b);
-        boxes.add(c);
-        boxes.add(d);
+        boxes.add(new Box(6f,-1f,1f,.5f,.5f,.5f,1,box));
+        boxes.add(new Box(2f,-1f,1f,.5f,.5f,.5f,1,box));
+        boxes.add(new Box(3f,0f,0f,.2f,.2f,.2f,1,box));
+        boxes.add(new Box(6f,-1f,1f,.5f,.5f,.5f,1,box));
         boxes.add(new Box(2f,1f,3f,.7f,.7f,.5f,1,box));
-        
-        for(Box x: boxes){
-            x.initGL();
+        for(Box box: boxes){
+            box.initGL();
         }
-        /*a.setTexture(box);
-        a.setGameParam(vertexSize, colorSize, amountOfVertices, texSize);
-        b.setTexture(box);
-        b.setGameParam(vertexSize, colorSize, amountOfVertices, texSize);*/
-
-        // Ceiling
-        vertexCeiling = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize);
-        vertexCeiling.put(new float[]{
-            -gridSizeX, ceilingHeight,  -gridSizeZ,
-            gridSizeX,  ceilingHeight,  -gridSizeZ,
-            gridSizeX,  ceilingHeight,  gridSizeZ,
-            -gridSizeX, ceilingHeight,  gridSizeZ,
-        });
-        vertexCeiling.flip();
-
-        // Floor
-        vertexFloor = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize);
-        vertexFloor.put(new float[]{
-            gridSizeX,  floorHeight,    gridSizeZ,
-            gridSizeX,  floorHeight,    -gridSizeZ,
-            -gridSizeX, floorHeight,    -gridSizeZ,        
-            -gridSizeX, floorHeight,    gridSizeZ,
-        });
-        vertexFloor.flip();
-        
-        // Texture Coords Ceiling/Floor
-        texCoordCeiling = BufferUtils.createFloatBuffer(amountOfVertices * colorSize);
-        texCoordCeiling.put(new float[]{
-            0, 0, gridSizeX*texSize, 0, gridSizeX*texSize, gridSizeZ*texSize, 0, gridSizeZ*texSize
-        });
-        texCoordCeiling.flip();
-        
-        // Walls
-        vertexWalls = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize * 4);
-        vertexWalls.put(new float[]{
-            // North wall
-            gridSizeX,  floorHeight,    -gridSizeZ,
-            gridSizeX,  ceilingHeight,  -gridSizeZ,
-            -gridSizeX, ceilingHeight,  -gridSizeZ,
-            -gridSizeX, floorHeight,    -gridSizeZ,
-            // West wall
-            -gridSizeX, floorHeight,    -gridSizeZ,
-            -gridSizeX, ceilingHeight,  -gridSizeZ,
-            -gridSizeX, ceilingHeight,  gridSizeZ,
-            -gridSizeX, floorHeight,    gridSizeZ,
-            // East wall
-            gridSizeX,  floorHeight,    gridSizeZ,
-            gridSizeX,  ceilingHeight,  gridSizeZ,
-            gridSizeX,  ceilingHeight,  -gridSizeZ,
-            gridSizeX,  floorHeight,    -gridSizeZ,
-            // South wall
-            -gridSizeX, floorHeight,    gridSizeZ,
-            -gridSizeX, ceilingHeight,  gridSizeZ,
-            gridSizeX,  ceilingHeight,  gridSizeZ,
-            gridSizeX,  floorHeight,    gridSizeZ,
-        });
-        vertexWalls.flip();
-        
-        // Texture coords walls
-        texCoordWalls = BufferUtils.createFloatBuffer(amountOfVertices * colorSize * 4);
-        texCoordWalls.put(new float[]{
-            0, 0, 0, gridSizeY*texSize, gridSizeX*texSize, gridSizeY*texSize, gridSizeX*texSize, 0,
-            0, 0, 0, gridSizeY*texSize, gridSizeX*texSize, gridSizeY*texSize, gridSizeX*texSize, 0,
-            0, 0, 0, gridSizeY*texSize, gridSizeX*texSize, gridSizeY*texSize, gridSizeX*texSize, 0,
-            0, 0, 0, gridSizeY*texSize, gridSizeX*texSize, gridSizeY*texSize, gridSizeX*texSize, 0,
-        });
-        texCoordWalls.flip();  
-        
-        // Box
-        /*vertexBox = BufferUtils.createFloatBuffer(amountOfVertices * vertexSize *5);
-        vertexBox.put(new float[]{
-            // North 
-            boxSize,  floorHeight,    -boxSize,
-            boxSize,  boxSize,  -boxSize,
-            -boxSize, boxSize,  -boxSize,
-            -boxSize, floorHeight,    -boxSize,
-            // West 
-            -boxSize, floorHeight,    -boxSize,
-            -boxSize, boxSize,  -boxSize,
-            -boxSize, boxSize,  boxSize,
-            -boxSize, floorHeight,    boxSize,
-            // East 
-            boxSize,  floorHeight,    boxSize,
-            boxSize,  boxSize,   boxSize,
-            boxSize,  boxSize,  -boxSize,
-            boxSize,  floorHeight,    -boxSize,
-            // South 
-            -boxSize, floorHeight,    boxSize,
-            -boxSize, boxSize,  boxSize,
-            boxSize,  boxSize,  boxSize,
-            boxSize,  floorHeight,    boxSize,
-            //top
-            -boxSize, boxSize,  -boxSize,
-            boxSize,  boxSize,  -boxSize,
-            boxSize,  boxSize,  boxSize,
-            -boxSize, boxSize,  boxSize,
-            
-        });
-        vertexBox.flip();*/
-        
-        // Texture coords box
-        /*texCoordBox = BufferUtils.createFloatBuffer(amountOfVertices * colorSize * 5);
-        texCoordBox.put(new float[]{
-            0, 0, 0, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize,0,
-            0, 0, 0, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize,0,
-            0, 0, 0, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize,0,
-            0, 0, 0, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize, 4*boxSize*texSize,0,
-            0, 0, 4*boxSize*texSize, 0, 4*boxSize*texSize, 4*boxSize*texSize, 0, 4*boxSize*texSize,
-        });
-        texCoordBox.flip(); */
-        
     }
     private static void destroyGL(){
         for(int tex: textures){
@@ -516,52 +404,13 @@ public class ShooterGame {
     }
     private static void render(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        glEnable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
-        //glEnable(GL_BITMAP);
-        // Room
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        
-        glBindTexture(GL_TEXTURE_2D, ceiling);
-        glVertexPointer(vertexSize, 0, vertexCeiling);
-        glTexCoordPointer(colorSize, 0, texCoordCeiling);
-        glDrawArrays(GL_QUADS, 0, amountOfVertices);
-        
-        glBindTexture(GL_TEXTURE_2D, floor);
-        glVertexPointer(vertexSize, 0, vertexFloor);
-        glDrawArrays(GL_QUADS, 0, amountOfVertices);   
-        
-        glBindTexture(GL_TEXTURE_2D, wall);
-        glVertexPointer(vertexSize, 0, vertexWalls);
-        glTexCoordPointer(colorSize, 0, texCoordWalls);
-        glDrawArrays(GL_QUADS, 0, amountOfVertices * 4);
-        
-        
-        // Box
-        /*boxMove();
-        glTranslatef(moveSpeed, 0, 0);
-        glBindTexture(GL_TEXTURE_2D, box);
-        glVertexPointer(vertexSize, 0, vertexBox);
-        glTexCoordPointer(colorSize, 0, texCoordBox);
-        glDrawArrays(GL_QUADS, 0, amountOfVertices * 5);*/
+
         room.render();
         
         for(Box q: boxes){
-           //q.setPosition(q.getX()+1, q.getY(), q.getZ()+1);
-            //q.move();
             q.render();  
         }
 
-        //a.render();
-        //b.render();
-       
-        //c.render();
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        
-        glBindTexture(GL_TEXTURE_2D, 0);
         // Player position
         glLoadIdentity();
         glRotatef(rotation.x, 1, 0, 0);
