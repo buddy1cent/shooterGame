@@ -34,5 +34,5 @@ public interface IntGameObject {
     public float getDY();
     public float getDZ();
     
-    public boolean intersets(IntGameObject other);
+    public boolean intersets();
 }

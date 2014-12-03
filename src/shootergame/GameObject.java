@@ -7,15 +7,17 @@ import org.lwjgl.util.vector.Vector3f;
  * @author Buddy-1cent
  */
 public abstract class GameObject implements IntGameObject {
-    private Vector3f position;
-    private Vector3f dynamic;
-    private float width;
-    private float height;
-    private float depth;
+    protected float x,y,z;
+    protected float dx,dy,dz;
+    protected float width;
+    protected float height;
+    protected float depth;
     
     public GameObject(float x,float y,float z,float width, float height, float depth){
-        position = new Vector3f(x, y, z);
-        dynamic = new Vector3f(0, 0, 0);
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        dx = dy = dz = 0;
         this.width = width;
         this.height = height;
         this.depth = depth;
@@ -23,26 +25,28 @@ public abstract class GameObject implements IntGameObject {
     
     @Override
     public void update(int delta){
-        position.x += delta * dynamic.x;
-        position.y += delta * dynamic.y;
-        position.z += delta * dynamic.z;
+        x += delta * x;
+        y += delta * y;
+        z += delta * z;
     }
     @Override
     public void setPosition(float x,float y, float z){
-        position = new Vector3f(x, y, z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
     /* Location */ 
     @Override
     public void setX(float x){
-        position.x = x;
+        this.x = x;
     }
     @Override
     public void setY(float y){
-        position.y = y;
+        this.y = y;
     }
     @Override
     public void setZ(float z){
-        position.z = z;
+        this.z = z;
     }
     @Override
     public void setWidth(float width){
@@ -58,15 +62,15 @@ public abstract class GameObject implements IntGameObject {
     }
     @Override
     public float getX(){
-        return position.x;
+        return x;
     }
     @Override
     public float getY(){
-        return position.y;
+        return y;
     }
     @Override
     public float getZ(){
-        return position.z;
+        return z;
     }
     @Override
     public float getWidth(){
@@ -83,31 +87,31 @@ public abstract class GameObject implements IntGameObject {
     /* Moving */
     @Override
     public void setDX(float dx){
-        dynamic.x = dx;
+        this.dx = dx;
     }
     @Override
     public void setDY(float dy){
-        dynamic.y = dy;
+        this.dy = dy;
     }
     @Override
     public void setDZ(float dz){
-        dynamic.z = dz;
+        this.dz = dz;
     }
     @Override
     public float getDX(){
-        return dynamic.x;
+        return dx;
     }
     @Override
     public float getDY(){
-        return dynamic.y;
+        return dy;
     }
     @Override
     public float getDZ(){
-        return dynamic.z;
+        return dz;
     }
     
-    @Override
-    public boolean intersets(IntGameObject other){
+    public boolean intersets(GameObject other){
+        
         return false;
     }
 }
