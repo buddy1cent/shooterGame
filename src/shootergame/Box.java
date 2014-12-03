@@ -48,7 +48,7 @@ public class Box extends GameObject{
         glEnable(GL_DEPTH_TEST);
         
         glBindTexture(GL_TEXTURE_2D, texture);
-
+        
         glVertexPointer(VERTEX_SIZE, 0, vertexBox);
         glTexCoordPointer(TEXTURE_COORD_SIZE, 0, texCoordBox);
         
