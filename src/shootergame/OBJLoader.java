@@ -20,15 +20,12 @@ public class OBJLoader {
         BufferedReader reader = new BufferedReader(new FileReader(new File(model)));
         Model m = new Model();
         String line;
-        boolean next = false;
         while((line = reader.readLine()) != null){
             if(line.startsWith("v  ")){
-                //if(next) break;
                 float x = Float.valueOf(line.split(" ")[2]);
                 float y = Float.valueOf(line.split(" ")[3]);
                 float z = Float.valueOf(line.split(" ")[4]);
-                m.vertices.add(new Vector3f(x, y, z));
-                
+                m.vertices.add(new Vector3f(x, y, z));   
             }
             if(line.startsWith("vn ")){
                 float x = Float.valueOf(line.split(" ")[1]);
@@ -47,18 +44,17 @@ public class OBJLoader {
                 float vz = Float.valueOf(line.split(" ")[3].split("/")[0]);
                 Vector3f vertex = new Vector3f(vx,vy,vz);
                 
-                float nx = Float.valueOf(line.split(" ")[1].split("/")[2]);
-                float ny = Float.valueOf(line.split(" ")[2].split("/")[2]);
-                float nz = Float.valueOf(line.split(" ")[3].split("/")[2]);
-                Vector3f normal = new Vector3f(nx,ny,nz);
-                
                 float tx = Float.valueOf(line.split(" ")[1].split("/")[1]);
                 float ty = Float.valueOf(line.split(" ")[2].split("/")[1]);
                 float tz = Float.valueOf(line.split(" ")[3].split("/")[1]);
                 Vector3f texture = new Vector3f(tx,ty,tz);
                 
+                float nx = Float.valueOf(line.split(" ")[1].split("/")[2]);
+                float ny = Float.valueOf(line.split(" ")[2].split("/")[2]);
+                float nz = Float.valueOf(line.split(" ")[3].split("/")[2]);
+                Vector3f normal = new Vector3f(nx,ny,nz);
+                
                 m.faces.add(new Model.Face(vertex,normal,texture)); 
-               // next = true;
             }
         }
         reader.close();

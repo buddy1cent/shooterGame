@@ -57,6 +57,7 @@ public class ShooterGame {
     private static int ceiling;
     private static int box;
     private static int mp5;
+    private static int colt;
     
     private static final int amountOfVertices = 4;
     private static final int vertexSize = 3;
@@ -179,6 +180,7 @@ public class ShooterGame {
         ceiling = initTexture(TextureType.CEILING);
         box = initTexture(TextureType.BOX);
         mp5 = initTexture(TextureType.MP5);
+        colt = initTexture(TextureType.COLT);
         
         room = new Room();
         room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeZ, "F", floor));
@@ -220,7 +222,7 @@ public class ShooterGame {
         
         model = null;
         try {
-            model = OBJLoader.load("src/res/objModels/MP5.obj");
+            model = OBJLoader.load("src/res/objModels/1911.obj");
         }catch(FileNotFoundException ex){
             ex.printStackTrace();
             System.out.println("OBJ file not found");
@@ -469,34 +471,35 @@ public class ShooterGame {
         for(Box q: boxes){
             q.render();  
         }
-        /*
-        glBindTexture(GL_TEXTURE_2D, mp5);
+        
+        glBindTexture(GL_TEXTURE_2D, colt);
+        //glBindTexture(GL_TEXTURE_2D, mp5);
         //glBindTexture(GL_TEXTURE_2D, 0);
         glBegin(GL_TRIANGLES);
-        for(Face face : model.faces){
-            Vector3f v1 = model.vertices.get((int) face.vertexIndices.x-1);
-            glVertex3f(v1.x, v1.y, v1.z);
-            Vector3f n1 = model.normals.get((int) face.normalIndices.x-1);
-            glNormal3f(n1.x, n1.y, n1.z);
+        for(Face face : model.faces){          
             Vector2f t1 = model.textures.get((int) face.textureIndices.x-1); 
             glTexCoord2f(t1.x, t1.y);
+            Vector3f n1 = model.normals.get((int) face.normalIndices.x-1);
+            glNormal3f(n1.x, n1.y, n1.z);
+            Vector3f v1 = model.vertices.get((int) face.vertexIndices.x-1);
+            glVertex3f(v1.x, v1.y, v1.z);
             
-            Vector3f v2 = model.vertices.get((int) face.vertexIndices.y-1);
-            glVertex3f(v2.x, v2.y, v2.z);
-            Vector3f n2 = model.normals.get((int) face.normalIndices.y-1);
-            glNormal3f(n2.x, n2.y, n2.z);
             Vector2f t2 = model.textures.get((int) face.textureIndices.y-1); 
             glTexCoord2f(t2.x, t2.y);
-            
-            Vector3f v3 = model.vertices.get((int) face.vertexIndices.z-1);
-            glVertex3f(v3.x, v3.y, v3.z);
+            Vector3f n2 = model.normals.get((int) face.normalIndices.y-1);
+            glNormal3f(n2.x, n2.y, n2.z);
+            Vector3f v2 = model.vertices.get((int) face.vertexIndices.y-1);
+            glVertex3f(v2.x, v2.y, v2.z);
+                      
+            Vector2f t3 = model.textures.get((int) face.textureIndices.z-1); 
+            glTexCoord2f(t3.x, t3.y);
             Vector3f n3 = model.normals.get((int) face.normalIndices.z-1);
             glNormal3f(n3.x, n3.y, n3.z);
-            Vector2f t3 = model.textures.get((int) face.textureIndices.z-1); 
-            glTexCoord2f(t3.x, t3.y); 
+            Vector3f v3 = model.vertices.get((int) face.vertexIndices.z-1);
+            glVertex3f(v3.x, v3.y, v3.z);     
         }
         glEnd();
-*/
+
         // Player position
         glLoadIdentity();
         glRotatef(rotation.x, 1, 0, 0);
