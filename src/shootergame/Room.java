@@ -15,6 +15,7 @@ import org.lwjgl.util.vector.Vector3f;
 public class Room {
     private final List<Wall> walls = new ArrayList<Wall>();
     private final float gap = 0.4f;
+    
     public void add(Wall w){
         w.initGL();
         walls.add(w);
@@ -46,9 +47,9 @@ public class Room {
         private FloatBuffer texCoordWall;
         
         public  Wall(float x, float y, float z, float width, float height, String facing, int texture) {
-            this.x = x;
+            this.x = -x;
             this.y = y;
-            this.z = z;
+            this.z = -z;
             this.width = width;
             this.height = height;
             this.facing = facing;
@@ -77,8 +78,8 @@ public class Room {
         public void initGL(){
             if(facing.compareTo("North") == 0 || facing.compareTo("N") == 0){
                 vertexCoords = new float [] {
-                    x + width, y, z,
-                    x + width, y + height, z,
+                    x - width, y, z,
+                    x - width, y + height, z,
                     x,y + height, z,
                     x, y, z,
                 };
@@ -87,14 +88,14 @@ public class Room {
                 vertexCoords = new float [] {
                     x, y, z,
                     x,y + height, z,
-                    x + width, y + height, z,
-                    x + width, y, z
+                    x - width, y + height, z,
+                    x - width, y, z
                 };
             }
             if(facing.compareTo("East") == 0 || facing.compareTo("E") == 0){
                 vertexCoords = new float [] {
-                    x, y, z + width,
-                    x, y + height, z + width,
+                    x, y, z - width,
+                    x, y + height, z - width,
                     x,y + height, z,
                     x, y, z,     
                 };
@@ -103,23 +104,23 @@ public class Room {
                 vertexCoords = new float [] {
                     x, y, z,
                     x,y + height, z,
-                    x, y + height, z + width,
-                    x, y, z + width
+                    x, y + height, z - width,
+                    x, y, z - width
                 };
             }
             if(facing.compareTo("Ceiling") == 0 || facing.compareTo("C") == 0){
                 vertexCoords = new float [] {
                     x, y, z,
-                    x + height, y, z,
-                    x + height, y, z + width,
-                    x, y, z + width,
+                    x - height, y, z,
+                    x - height, y, z - width,
+                    x, y, z - width,
                 };
             }
             if(facing.compareTo("Floor") == 0 || facing.compareTo("F") == 0 ){
                 vertexCoords = new float [] {
-                    x, y, z + width,
-                    x + height, y, z + width,
-                    x + height, y, z,
+                    x, y, z - width,
+                    x - height, y, z - width,
+                    x - height, y, z,
                     x, y, z,  
                 };
             }
@@ -157,7 +158,8 @@ public class Room {
        
     }
     public Vector3f wallIntersect(Vector3f position){
-            for(Wall wall: walls){
+            
+        for(Wall wall: walls){
                 //test zda je za zdi a kdyz je tak jeji testovani vynecha
                 /*if(position.z < (-wall.getZ()+0.1f)){
                     //testuje jestli se jedna o North a jeji pozici plus jeji sirku

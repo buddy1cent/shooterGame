@@ -52,12 +52,7 @@ public class ShooterGame {
     private static List<Box> boxes;
     private static Room room;
     
-    private static int floor;
-    private static int wall;
-    private static int ceiling;
-    private static int box;
-    private static int mp5;
-    private static int colt;
+    public  static int floor,wall,ceiling,box,mp5,colt;
     
     private static final int amountOfVertices = 4;
     private static final int vertexSize = 3;
@@ -81,8 +76,8 @@ public class ShooterGame {
     private static float maxSizeZ = gridSizeZ - 0.5f;
     private static float texSize = 1f;
     
-    private static Vector3f position = new Vector3f(-5, 0, -5);
-    private static Vector3f rotation = new Vector3f(0, 0, 0);
+    private static Vector3f position = new Vector3f(7.5f, 0, 1.5f);
+    private static Vector3f rotation = new Vector3f(0, 90, 0);
     private static float moveSpeed = 0f;
     private static float x = 0.01f;
     private static float walkingSpeed = 15f;
@@ -183,33 +178,14 @@ public class ShooterGame {
         colt = initTexture(TextureType.COLT);
         
         room = new Room();
+/*
         room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeZ, "F", floor));
         room.add(new Wall(0, ceilingHeight, 0, gridSizeX, gridSizeZ, "C", ceiling));
         room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeY, "N", wall));
-        room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeY, "W", wall));
+        room.add(new Wall(0, floorHeight, 0, gridSizeZ, gridSizeY, "W", wall));
         room.add(new Wall(0, floorHeight, gridSizeZ, gridSizeX, gridSizeY, "S", wall));
         room.add(new Wall(gridSizeX, floorHeight, 0, gridSizeX, gridSizeY, "E", wall));
-        //room.add();
-        /*
-        room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeZ*2, "Floor", floor));
-        room.add(new Wall(-gridSizeX, ceilingHeight, -gridSizeZ, gridSizeX*2, gridSizeZ*2, "Ceiling", ceiling));
-        room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "N", wall));
-        room.add(new Wall(-gridSizeX, floorHeight, gridSizeZ, gridSizeX*2, gridSizeY, "S", wall));
-        room.add(new Wall(gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "E", wall));
-        room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "W", wall));
-        */
-        /*
-        //par
-        room.add(new Wall(-gridSizeX+5f, floorHeight, -gridSizeZ+2, gridSizeX, gridSizeY, "N", ceiling));
-        room.add(new Wall(-gridSizeX+5f, floorHeight, gridSizeZ-18, gridSizeX, gridSizeY, "S", ceiling));
-        
-        
-        room.add(new Wall(-gridSizeX+5f, floorHeight+2f, -gridSizeZ-2f, gridSizeX, gridSizeZ, "Floor", wall));
-        room.add(new Wall(-gridSizeX+2f, ceilingHeight-2f, -gridSizeZ, gridSizeX, gridSizeZ, "Ceiling", floor));
-        room.add(new Wall(-gridSizeX+5f, floorHeight, gridSizeZ-2, gridSizeX, gridSizeY, "S", ceiling));
-        room.add(new Wall(gridSizeX-2f, floorHeight, -gridSizeZ+5f, gridSizeX, gridSizeY, "E", ceiling));
-        room.add(new Wall(-gridSizeX+2f, floorHeight, -gridSizeZ+5f, gridSizeX, gridSizeY, "W", ceiling));
-        */
+       */
         boxes = new ArrayList<Box>();
         boxes.add(new Box(6f,-1f,1f,.5f,.5f,.5f,1,box));
         boxes.add(new Box(2f,-1f,1f,.5f,.5f,.5f,1,box));
@@ -223,9 +199,10 @@ public class ShooterGame {
         model = null;
         try {
             model = OBJLoader.load("src/res/objModels/1911.obj");
+            room = RoomLoader.load("src/res/mapa.txt");
         }catch(FileNotFoundException ex){
             ex.printStackTrace();
-            System.out.println("OBJ file not found");
+            System.out.println("File not found!");
             endGame();
         }catch (IOException ex) {
             ex.printStackTrace();
@@ -434,7 +411,7 @@ public class ShooterGame {
             position.x=-maxSizeX;   
         }*/
         room.wallIntersect(position);
-            System.out.println("True X: " + position.x + " ,Y: " + position.y + " ,Z: " + position.z);
+            //System.out.println("True X: " + position.x + " ,Y: " + position.y + " ,Z: " + position.z);
     }
     private static void boxMove(){
         
@@ -506,6 +483,8 @@ public class ShooterGame {
         glRotatef(rotation.y, 0, 1, 0);
         glRotatef(rotation.z, 0, 0, 1);
         glTranslatef(position.x, position.y, position.z);
+        
+        System.out.println("X: "+ position.x + " Y: " + position.y + " Z: " + position.z);
         
         Display.update();
         if(VSync)

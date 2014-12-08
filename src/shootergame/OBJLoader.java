@@ -22,21 +22,21 @@ public class OBJLoader {
         String line;
         while((line = reader.readLine()) != null){
             if(line.startsWith("v  ")){
-                float x = Float.valueOf(line.split(" ")[2]);
-                float y = Float.valueOf(line.split(" ")[3]);
-                float z = Float.valueOf(line.split(" ")[4]);
+                float x = Float.valueOf(line.split(" ")[2])/100;
+                float y = Float.valueOf(line.split(" ")[3])/100;
+                float z = Float.valueOf(line.split(" ")[4])/100;
                 m.vertices.add(new Vector3f(x, y, z));   
             }
             if(line.startsWith("vn ")){
-                float x = Float.valueOf(line.split(" ")[1]);
-                float y = Float.valueOf(line.split(" ")[2]);
-                float z = Float.valueOf(line.split(" ")[3]);
+                float x = Float.valueOf(line.split(" ")[1])/100;
+                float y = Float.valueOf(line.split(" ")[2])/100;
+                float z = Float.valueOf(line.split(" ")[3])/100;
                 m.normals.add(new Vector3f(x, y, z));
             }
             if(line.startsWith("vt ")){
                 float x = Float.valueOf(line.split(" ")[1]);
                 float y = Float.valueOf(line.split(" ")[2]);
-                m.textures.add(new Vector2f(x,y));
+                m.textures.add(new Vector2f(x,-y));
             }
             if(line.startsWith("f ")){
                 float vx = Float.valueOf(line.split(" ")[1].split("/")[0]);
