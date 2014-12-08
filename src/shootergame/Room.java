@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package shootergame;
 
 import java.nio.FloatBuffer;
@@ -26,7 +21,7 @@ public class Room {
     }
     public void render(){
         glEnable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
+       // glDisable(GL_DEPTH_TEST);
         glEnable(GL_BITMAP);
         
         for(Wall wall: walls)

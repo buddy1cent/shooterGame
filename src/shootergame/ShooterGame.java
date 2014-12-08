@@ -20,11 +20,15 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.GL15;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
+import org.lwjgl.util.vector.Vector2f;
 import static shootergame.Room.Wall;
+import static shootergame.Model.Face;
 
 
 public class ShooterGame {
@@ -32,7 +36,7 @@ public class ShooterGame {
     private static final int HEIGHT = 720;
     private static boolean VSync = true;
     private static int SyncFPS = 60; 
-    private static float fov = 75;
+    private static float fov = 70;
     private static float aspectRatio = WIDTH / HEIGHT;
     private static float zNear = 0.001f;
     private static float zFar = 100f;
@@ -52,6 +56,7 @@ public class ShooterGame {
     private static int wall;
     private static int ceiling;
     private static int box;
+    private static int mp5;
     
     private static final int amountOfVertices = 4;
     private static final int vertexSize = 3;
@@ -64,7 +69,7 @@ public class ShooterGame {
     private static FloatBuffer vertexBox;
     private static FloatBuffer texCoordBox;
     private static Box a,b,c,d ;
-    
+    private static Model model;
     
     private static float ceilingHeight = 5f;
     private static float floorHeight = -1f;
@@ -75,7 +80,7 @@ public class ShooterGame {
     private static float maxSizeZ = gridSizeZ - 0.5f;
     private static float texSize = 1f;
     
-    private static Vector3f position = new Vector3f(0, 0, 0);
+    private static Vector3f position = new Vector3f(-5, 0, -5);
     private static Vector3f rotation = new Vector3f(0, 0, 0);
     private static float moveSpeed = 0f;
     private static float x = 0.01f;
@@ -158,7 +163,7 @@ public class ShooterGame {
     }
    
     private static void initGL(){
-        position = new Vector3f();
+        //position = new Vector3f();
         
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -173,25 +178,36 @@ public class ShooterGame {
         wall = initTexture(TextureType.WALL);
         ceiling = initTexture(TextureType.CEILING);
         box = initTexture(TextureType.BOX);
+        mp5 = initTexture(TextureType.MP5);
         
         room = new Room();
+        room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeZ, "F", floor));
+        room.add(new Wall(0, ceilingHeight, 0, gridSizeX, gridSizeZ, "C", ceiling));
+        room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeY, "N", wall));
+        room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeY, "W", wall));
+        room.add(new Wall(0, floorHeight, gridSizeZ, gridSizeX, gridSizeY, "S", wall));
+        room.add(new Wall(gridSizeX, floorHeight, 0, gridSizeX, gridSizeY, "E", wall));
+        //room.add();
+        /*
         room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeZ*2, "Floor", floor));
         room.add(new Wall(-gridSizeX, ceilingHeight, -gridSizeZ, gridSizeX*2, gridSizeZ*2, "Ceiling", ceiling));
         room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "N", wall));
         room.add(new Wall(-gridSizeX, floorHeight, gridSizeZ, gridSizeX*2, gridSizeY, "S", wall));
         room.add(new Wall(gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "E", wall));
         room.add(new Wall(-gridSizeX, floorHeight, -gridSizeZ, gridSizeX*2, gridSizeY, "W", wall));
-        
+        */
+        /*
         //par
         room.add(new Wall(-gridSizeX+5f, floorHeight, -gridSizeZ+2, gridSizeX, gridSizeY, "N", ceiling));
         room.add(new Wall(-gridSizeX+5f, floorHeight, gridSizeZ-18, gridSizeX, gridSizeY, "S", ceiling));
         
-        /*room.add(new Wall(-gridSizeX+5f, floorHeight+2f, -gridSizeZ-2f, gridSizeX, gridSizeZ, "Floor", wall));
+        
+        room.add(new Wall(-gridSizeX+5f, floorHeight+2f, -gridSizeZ-2f, gridSizeX, gridSizeZ, "Floor", wall));
         room.add(new Wall(-gridSizeX+2f, ceilingHeight-2f, -gridSizeZ, gridSizeX, gridSizeZ, "Ceiling", floor));
         room.add(new Wall(-gridSizeX+5f, floorHeight, gridSizeZ-2, gridSizeX, gridSizeY, "S", ceiling));
         room.add(new Wall(gridSizeX-2f, floorHeight, -gridSizeZ+5f, gridSizeX, gridSizeY, "E", ceiling));
-        room.add(new Wall(-gridSizeX+2f, floorHeight, -gridSizeZ+5f, gridSizeX, gridSizeY, "W", ceiling));*/
-        
+        room.add(new Wall(-gridSizeX+2f, floorHeight, -gridSizeZ+5f, gridSizeX, gridSizeY, "W", ceiling));
+        */
         boxes = new ArrayList<Box>();
         boxes.add(new Box(6f,-1f,1f,.5f,.5f,.5f,1,box));
         boxes.add(new Box(2f,-1f,1f,.5f,.5f,.5f,1,box));
@@ -201,6 +217,20 @@ public class ShooterGame {
         for(Box box: boxes){
             box.initGL();
         }
+        
+        model = null;
+        try {
+            model = OBJLoader.load("src/res/objModels/MP5.obj");
+        }catch(FileNotFoundException ex){
+            ex.printStackTrace();
+            System.out.println("OBJ file not found");
+            endGame();
+        }catch (IOException ex) {
+            ex.printStackTrace();
+            endGame();
+        }
+        
+        
     }
     private static void destroyGL(){
         for(int tex: textures){
@@ -415,13 +445,58 @@ public class ShooterGame {
     }
     private static void render(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
+        // Light
+        /*
+        glShadeModel(GL_SMOOTH);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        FloatBuffer buf = BufferUtils.createFloatBuffer(4);
+                buf.put(new float[] {0.5f, 0.5f, 0.5f, 1f});
+                buf.flip();
+        FloatBuffer buf2 = BufferUtils.createFloatBuffer(4);
+                buf2.put(new float[] {1f, 2f, 2f, 1f});
+                buf2.flip();
+        
+        glLightModel(GL_LIGHT_MODEL_AMBIENT, buf);
+        glLight(GL_LIGHT0, GL_POSITION, buf2);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+*/
         room.render();
         
         for(Box q: boxes){
             q.render();  
         }
-
+        /*
+        glBindTexture(GL_TEXTURE_2D, mp5);
+        //glBindTexture(GL_TEXTURE_2D, 0);
+        glBegin(GL_TRIANGLES);
+        for(Face face : model.faces){
+            Vector3f v1 = model.vertices.get((int) face.vertexIndices.x-1);
+            glVertex3f(v1.x, v1.y, v1.z);
+            Vector3f n1 = model.normals.get((int) face.normalIndices.x-1);
+            glNormal3f(n1.x, n1.y, n1.z);
+            Vector2f t1 = model.textures.get((int) face.textureIndices.x-1); 
+            glTexCoord2f(t1.x, t1.y);
+            
+            Vector3f v2 = model.vertices.get((int) face.vertexIndices.y-1);
+            glVertex3f(v2.x, v2.y, v2.z);
+            Vector3f n2 = model.normals.get((int) face.normalIndices.y-1);
+            glNormal3f(n2.x, n2.y, n2.z);
+            Vector2f t2 = model.textures.get((int) face.textureIndices.y-1); 
+            glTexCoord2f(t2.x, t2.y);
+            
+            Vector3f v3 = model.vertices.get((int) face.vertexIndices.z-1);
+            glVertex3f(v3.x, v3.y, v3.z);
+            Vector3f n3 = model.normals.get((int) face.normalIndices.z-1);
+            glNormal3f(n3.x, n3.y, n3.z);
+            Vector2f t3 = model.textures.get((int) face.textureIndices.z-1); 
+            glTexCoord2f(t3.x, t3.y); 
+        }
+        glEnd();
+*/
         // Player position
         glLoadIdentity();
         glRotatef(rotation.x, 1, 0, 0);

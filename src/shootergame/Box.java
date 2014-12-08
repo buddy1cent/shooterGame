@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package shootergame;
 
 import java.nio.FloatBuffer;
@@ -28,7 +23,7 @@ public class Box extends GameObject{
         this.texture = texture;
         TEXTURE_SIZE = texSize;
         
-        System.out.println("initX: " + this.getX() + " ,Y: " + this.getY() + " ,Z: " + this.getZ());
+        //System.out.println("initX: " + this.getX() + " ,Y: " + this.getY() + " ,Z: " + this.getZ());
         //System.out.println("conX: " + this.getWidth() + " ,height: " + this.getHeight() + " ,depth: " + this.getDepth());
     }
     
@@ -93,9 +88,7 @@ public class Box extends GameObject{
             x, y, z,
             x, y, z + depth,
             x + width, y, z +depth,
-            x + width, y, z,
-            
-                      
+            x + width, y, z,       
         });
         vertexBox.flip();
 
