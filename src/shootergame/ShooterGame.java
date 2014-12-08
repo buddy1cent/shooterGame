@@ -77,7 +77,7 @@ public class ShooterGame {
     private static float texSize = 1f;
     
     private static Vector3f position = new Vector3f(7.5f, 0, 1.5f);
-    private static Vector3f rotation = new Vector3f(0, 90, 0);
+    private static Vector3f rotation = new Vector3f(0, 180, 0);
     private static float moveSpeed = 0f;
     private static float x = 0.01f;
     private static float walkingSpeed = 15f;
