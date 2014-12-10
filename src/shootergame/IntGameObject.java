@@ -1,5 +1,7 @@
 package shootergame;
 
+import org.lwjgl.util.vector.Vector3f;
+
 /**
  *
  * @author Buddy-1cent
@@ -34,5 +36,5 @@ public interface IntGameObject {
     public float getDY();
     public float getDZ();
     
-    public boolean intersets();
+    public Vector3f intersect();
 }

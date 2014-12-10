@@ -3,6 +3,7 @@ package shootergame;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.GL11.*;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
  *
@@ -10,6 +11,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Box extends GameObject{
     
+    private final float gap = 0.1f;
     private final int texture;
     private final float TEXTURE_SIZE;
     private final int VERTEX_SIZE = 3;
@@ -105,7 +107,34 @@ public class Box extends GameObject{
     }
 
     @Override
-    public boolean intersets() {
+    public Vector3f intersect(Vector3f position) {
+        //jedna stena
+        if(((position.z >= (-getZ()-getWidth()-gap)) && (position.z <= (-getZ()-getWidth()+0.01f)))   && (position.x < -getX() && position.x > (-getX()-getWidth()) )){
+            
+            position.z = -getZ()-getWidth()-gap;              
+                    
+        }
+        if(position.z <= (-getZ()+gap) && (position.x < -getX() && position.x > (-getX()-getWidth())) ){
+            if(position.z > (-getZ()-0.01f) ){
+                position.z = -getZ()+gap;      
+            }
+        }
+        if(position.x >= (-getX()-getWidth()-gap) && (position.z < -getZ() && position.z > (-getZ()-getWidth()) )){
+                    if(position.x < (-getX()-getWidth()+0.01f)){
+                        position.x = -getX()-getWidth()-gap;   
+                    }
+        }
+        if(position.x <= (-getX()+gap) && (position.z < -getZ() && position.z > (-getZ()-getWidth()) )){
+                    if(position.x > (-getX()-0.01f)){
+                        position.x = -getX()+gap;   
+                    }
+        }
+        System.out.println("X: " + position.x + " ,boxx: " + -getX() + "    ,Y: " + position.y + " ,boxY: "+ -getY() +"    ,Z: " + position.z + " ,boxZ: "+ -getZ() +  " ,width: "+getWidth());  
+        return position;
+    }
+
+    @Override
+    public Vector3f intersect() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

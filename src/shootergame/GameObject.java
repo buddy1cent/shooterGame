@@ -109,9 +109,8 @@ public abstract class GameObject implements IntGameObject {
     public float getDZ(){
         return dz;
     }
-    
-    public boolean intersets(GameObject other){
+    public Vector3f intersect(Vector3f position){
         
-        return false;
+        return position;
     }
 }
