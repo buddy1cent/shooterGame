@@ -25,7 +25,7 @@ public class OBJLoader {
                 float x = Float.valueOf(line.split(" ")[2])/100;
                 float y = Float.valueOf(line.split(" ")[3])/100;
                 float z = Float.valueOf(line.split(" ")[4])/100;
-                m.vertices.add(new Vector3f(x, y, z));   
+                m.vertices.add(new Vector3f(x-10.5f, y-.25f, z-1f));   
             }
             if(line.startsWith("vn ")){
                 float x = Float.valueOf(line.split(" ")[1])/100;
@@ -52,7 +52,7 @@ public class OBJLoader {
                 float nx = Float.valueOf(line.split(" ")[1].split("/")[2]);
                 float ny = Float.valueOf(line.split(" ")[2].split("/")[2]);
                 float nz = Float.valueOf(line.split(" ")[3].split("/")[2]);
-                Vector3f normal = new Vector3f(nx,ny,nz);
+                Vector3f normal = new Vector3f(nx+.5f,ny,nz);
                 
                 m.faces.add(new Model.Face(vertex,normal,texture)); 
             }

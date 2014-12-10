@@ -5,6 +5,7 @@ public enum TextureType {
     CEILING("src/res/ceiling.png"),
     FLOOR("src/res/floor.png"),
     BOX("src/res/Wood_Box.png"),
+    TARGET("src/res/Target.png"),
     MP5("src/res/objModels/Tex_0004_1.png"),
     COLT("src/res/objModels/Tex_0008_1.png");
     

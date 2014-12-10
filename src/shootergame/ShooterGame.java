@@ -52,7 +52,7 @@ public class ShooterGame {
     private static List<Box> boxes;
     private static Room room;
     
-    public  static int floor,wall,ceiling,box,mp5,colt;
+    public  static int floor,wall,ceiling,box,target,mp5,colt;
     
     private static final int amountOfVertices = 4;
     private static final int vertexSize = 3;
@@ -170,36 +170,22 @@ public class ShooterGame {
         glEnable(GL_TEXTURE_2D);
         // Load textures
         textures = new ArrayList<Integer>();
+        boxes = new ArrayList<Box>();
         floor = initTexture(TextureType.FLOOR);
         wall = initTexture(TextureType.WALL);
         ceiling = initTexture(TextureType.CEILING);
         box = initTexture(TextureType.BOX);
+        target = initTexture(TextureType.TARGET);
         mp5 = initTexture(TextureType.MP5);
         colt = initTexture(TextureType.COLT);
         
         room = new Room();
-/*
-        room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeZ, "F", floor));
-        room.add(new Wall(0, ceilingHeight, 0, gridSizeX, gridSizeZ, "C", ceiling));
-        room.add(new Wall(0, floorHeight, 0, gridSizeX, gridSizeY, "N", wall));
-        room.add(new Wall(0, floorHeight, 0, gridSizeZ, gridSizeY, "W", wall));
-        room.add(new Wall(0, floorHeight, gridSizeZ, gridSizeX, gridSizeY, "S", wall));
-        room.add(new Wall(gridSizeX, floorHeight, 0, gridSizeX, gridSizeY, "E", wall));
-       */
-        boxes = new ArrayList<Box>();
-        boxes.add(new Box(6f,-1f,1f,.5f,.5f,.5f,1,box));
-        boxes.add(new Box(2f,-1f,1f,.5f,.5f,.5f,1,box));
-        boxes.add(new Box(3f,0f,0f,.2f,.2f,.2f,1,box));
-        boxes.add(new Box(6f,-1f,1f,.5f,.5f,.5f,1,box));
-        boxes.add(new Box(2f,1f,3f,.7f,.7f,.5f,1,box));
-        for(Box box: boxes){
-            box.initGL();
-        }
-        
+  
         model = null;
         try {
             model = OBJLoader.load("src/res/objModels/1911.obj");
             room = RoomLoader.load("src/res/mapa.txt");
+            boxes = BoxLoader.load("src/res/box.txt");
         }catch(FileNotFoundException ex){
             ex.printStackTrace();
             System.out.println("File not found!");
@@ -207,6 +193,9 @@ public class ShooterGame {
         }catch (IOException ex) {
             ex.printStackTrace();
             endGame();
+        }
+        for(Box box: boxes){
+            box.initGL();
         }
         
         
@@ -411,6 +400,9 @@ public class ShooterGame {
             position.x=-maxSizeX;   
         }*/
         room.wallIntersect(position);
+        for(Box q: boxes){
+            q.intersect(position);  
+        }
             //System.out.println("True X: " + position.x + " ,Y: " + position.y + " ,Z: " + position.z);
     }
     private static void boxMove(){
